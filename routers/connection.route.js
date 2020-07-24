@@ -7,12 +7,15 @@ router.post("/", async (req, res) => {
     const dbInfo = req.body;
     try {
         var response = {
-            employee: [],
-            department: [],
-            team: [],
+            employee: {},
+            department: {},
+            team: {},
+            checkConnection: {}
             // member: []
         }
-        var newConnection = dbInfo;
+        var check = await testConnectionDao.checkConnection(dbInfo);
+        console.log("test: " + check);
+
         console.log(dbInfo);
         const connectionString = sql_connection.createConnection({
             host: dbInfo.host,
@@ -51,32 +54,26 @@ router.post("/", async (req, res) => {
             }
             for (var i = 0; i < result.length; i++) {
                 if (result[i].TABLE_NAME == "employee") {
-                    response.employee.push(result[i])
+                    response.employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                 }
                 if (result[i].TABLE_NAME == "department") {
-                    response.department.push(result[i])
+                    response.department[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                 }
                 if (result[i].TABLE_NAME == "team") {
-                    response.team.push(result[i])
+                    response.team[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                 }
             }
 
+            // if (result.length > 0) {
+            connectionString.destroy(function (err) {
+                if (err) {
+                    console.log(err);
+                }
+            })
+            res.json(response);
+            // } else {
 
-            if (result.length > 0) {
-                connectionString.destroy(function (err) {
-                    if (err) {
-                        console.log(err);
-                    }
-                })
-                res.json(response);
-            } else {
-                connectionString.destroy(function (err) {
-                    if (err) {
-                        console.log(err);
-                    }
-                })
-                res.json(response);
-            }
+
         })
 
     } catch (err) {
