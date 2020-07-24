@@ -1,5 +1,4 @@
 const Sequelize = require("sequelize");
-const sql_connection = require('mysql');
 module.exports = {
     dbConnection: (dbInfo) => {
         const connection = new Sequelize(dbInfo.dbName, dbInfo.username, dbInfo.password, {

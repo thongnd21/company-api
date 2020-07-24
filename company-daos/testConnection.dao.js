@@ -4,7 +4,7 @@ module.exports = {
     checkConnection: async (dbInfo) => {
         try {
             var checkConnect = false;
-            await db.dbConnection(dbInfo).authenticate()
+            return await db.dbConnection(dbInfo).authenticate()
                 .then(() => {
                     checkConnect = true;
                     return checkConnect;
