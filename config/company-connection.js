@@ -3,7 +3,7 @@ module.exports = {
     dbConnection: (dbInfo) => { 
     const connection = new Sequelize(dbInfo.dbName, dbInfo.username, dbInfo.password, {
         host: dbInfo.host,
-        dialect: 'mysql',
+        dialect: dbInfo.dialect,
         port: dbInfo.port,
         timestamps: false,
         pool: {
