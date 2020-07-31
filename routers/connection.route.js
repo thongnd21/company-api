@@ -13,41 +13,60 @@ const team_dao = require('../company-daos/team.dao');
 router.post("/", async (req, res) => {
     const dbInfo = req.body;
     try {
-      
+
         var structure = {
             employees: [],
             teams: [],
             departments: [],
-            checkConnection: {}
+            checkConnection: {
+                status : '',
+                message : ''
+            }
         }
         var check = await testConnectionDao.checkConnection(dbInfo);
         if (check === true) {
-          
+
             //get employees
-            structure.checkConnection["status"] = true;
+            structure.checkConnection.status = "success";
             var employeeResponse = await employee_dao.getAllEmployeeToCheck(dbInfo);
             console.log("----Get all employee from HRMS---");
-    
+
             structure.employees = [...structure.employees, ...employeeResponse];
-    
+
             var teamResponse = await team_dao.findAllTeamToCheck(dbInfo);
-    
+
             structure.teams = [...structure.teams, ...teamResponse];
-    
+
             // get derpartments
             var departmentResponse = await department_dao.findAllDepartmentToCheck(dbInfo);
             await departmentResponse.map(item => {
                 structure.departments.push(item);
             })
-    
-    
+
+
             res.json(structure);
 
 
-        }else {
+        } else {
             // structure.checkConnection["status"] = false;
-            res.json(check);
-            console.log(check);
+            if (check.original.code == "ER_DBACCESS_DENIED_ERROR") {
+                structure.checkConnection.status = "fail";
+                structure.checkConnection.message = "Wrong connection name, please input again!";
+            }else if(check.original.code ==  "ENOTFOUND"){
+                structure.checkConnection.status = "fail";
+                structure.checkConnection.message = "Wrong host, please input again!";
+            }else if(check.original.code ==  "ETIMEDOUT"){
+                structure.checkConnection.status = "fail";
+                structure.checkConnection.message = "Wrong port, please input again!";
+            }else if(check.original.code ==  "ER_ACCESS_DENIED_ERROR"){
+                structure.checkConnection.status = "fail";
+                structure.checkConnection.message = "Wrong user name or password, please input again!";
+            }else{
+                structure.checkConnection.status = "fail";
+                structure.checkConnection.message = "Can not connect, please input again!";
+            }
+            res.json(structure);
+            // console.log(check);
         }
     } catch (err) {
         console.log(err);
