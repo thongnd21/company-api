@@ -5,14 +5,14 @@ module.exports = {
         try {
             var checkConnect = false;
             return await db.dbConnection(dbInfo).authenticate()
-            .then(() =>
-                {
+                .then(() => {
                     checkConnect = true;
                     return checkConnect;
-                } 
-            )
+                }
+                )
         } catch (err) {
             console.log(err);
+            return err;
         }
     },
 };
