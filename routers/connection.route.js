@@ -13,98 +13,60 @@ const team_dao = require('../company-daos/team.dao');
 router.post("/", async (req, res) => {
     const dbInfo = req.body;
     try {
-        // var response = {
-        //     employee: {},
-        //     department: {},
-        //     team: {},
-        //     team_employee: {},
-        //     checkConnection: {}
-        // }
+
         var structure = {
             employees: [],
             teams: [],
             departments: [],
-            checkConnection: {}
+            checkConnection: {
+                status : '',
+                message : ''
+            }
         }
         var check = await testConnectionDao.checkConnection(dbInfo);
         if (check === true) {
-            // response.checkConnection["status"] = check;
-            // const connectionString = sql_connection.createConnection({
-            //     host: dbInfo.host,
-            //     user: dbInfo.username,
-            //     password: dbInfo.password,
-            //     database: dbInfo.dbName,
-            //     port: dbInfo.port,
-            //     timestamps: false,
-            //     pool: {
-            //         max: 5,
-            //         min: 0,
-            //         acquire: 30000,
-            //         idle: 10000
-            //     }
-            // })
-            // connect db
-            // connectionString.connect(function (err) {
-            //     if (err) throw err;
-            //     console.log('error when connecting to db:', err);
-            // });
-            // after connect, query get all information of tabel in db
-            //     await connectionString.query('select * from information_schema.columns where table_schema = ' + '"' + dbInfo.dbName + '"' + ' order by table_name,ordinal_position', (err, result, fields) => {
-            //         if (err) {
-            //             console.log(err);
-            //         }
-            //         for (var i = 0; i < result.length; i++) {
-            //             if (result[i].TABLE_NAME == "employee") {
-            //                 response.employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-            //             }
-            //             if (result[i].TABLE_NAME == "department") {
-            //                 response.department[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-            //             }
-            //             if (result[i].TABLE_NAME == "team") {
-            //                 response.team[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-            //             }
-            //             if (result[i].TABLE_NAME == "team_employee") {
-            //                 response.team_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-            //             }
-            //         }
 
-
-            //         connectionString.destroy(function (err) {
-            //             if (err) {
-            //                 console.log(err);
-            //             }
-            //         })
-            //         res.json(response);
-            //     })
-            // }else{
-            //     response.checkConnection["status"] = false;
-            //     res.json(response);
-            // }
-            
             //get employees
-            structure.checkConnection["status"] = true;
+            structure.checkConnection.status = "success";
             var employeeResponse = await employee_dao.getAllEmployeeToCheck(dbInfo);
             console.log("----Get all employee from HRMS---");
-    
+
             structure.employees = [...structure.employees, ...employeeResponse];
-    
+
             var teamResponse = await team_dao.findAllTeamToCheck(dbInfo);
-    
+
             structure.teams = [...structure.teams, ...teamResponse];
-    
+
             // get derpartments
             var departmentResponse = await department_dao.findAllDepartmentToCheck(dbInfo);
             await departmentResponse.map(item => {
                 structure.departments.push(item);
             })
-    
-    
+
+
             res.json(structure);
 
 
-        }else {
-            structure.checkConnection["status"] = false;
+        } else {
+            // structure.checkConnection["status"] = false;
+            if (check.original.code == "ER_DBACCESS_DENIED_ERROR") {
+                structure.checkConnection.status = "fail";
+                structure.checkConnection.message = "Wrong connection name, please input again!";
+            }else if(check.original.code ==  "ENOTFOUND"){
+                structure.checkConnection.status = "fail";
+                structure.checkConnection.message = "Wrong host, please input again!";
+            }else if(check.original.code ==  "ETIMEDOUT"){
+                structure.checkConnection.status = "fail";
+                structure.checkConnection.message = "Wrong port, please input again!";
+            }else if(check.original.code ==  "ER_ACCESS_DENIED_ERROR"){
+                structure.checkConnection.status = "fail";
+                structure.checkConnection.message = "Wrong user name or password, please input again!";
+            }else{
+                structure.checkConnection.status = "fail";
+                structure.checkConnection.message = "Can not connect, please input again!";
+            }
             res.json(structure);
+            // console.log(check);
         }
     } catch (err) {
         console.log(err);
