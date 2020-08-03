@@ -37,7 +37,7 @@ module.exports = {
             return await emp.findAll({
                 attributes: ['id', 'primary_email', 'personal_email',
                     'first_name', 'last_name', 'modified_date', 'address',
-                    'department_id', 'phone', 'status_id'],
+                    'department_id', 'phone', 'status_id', 'position_id'],
                 include: [
                     {
                         model: dep,

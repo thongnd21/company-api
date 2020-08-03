@@ -1,12 +1,14 @@
 const Sequelize = require("sequelize");
 const Team = require('./Team');
 const Department = require('./Department');
+const Position = require('./Positon');
 
 
 module.exports = {
-    EmpModel: (db) =>{
+    EmpModel: (db) => {
         const team = Team.TeamModel(db);
         const dep = Department.DepModel(db);
+        const postion = Position.PositionModel(db);
         const Employee = db.define(
             "employee",
             {
@@ -40,7 +42,7 @@ module.exports = {
                 status_id: {
                     type: Sequelize.INTEGER
                 },
-                role_id: {
+                position_id: {
                     type: Sequelize.INTEGER
                 },
                 created_date: {
@@ -73,6 +75,14 @@ module.exports = {
             as: "team",
             foreignKey: "employee_id"
         });
-    return Employee;
+        Employee.belongsTo(postion, {
+            foreignKey: "position_id",
+            sourceKey: "id"
+        });
+        postion.hasMany(Employee, {
+            foreignKey: "position_id",
+            sourceKey: "id"
+        });
+        return Employee;
     }
 }
