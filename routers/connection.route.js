@@ -9,6 +9,7 @@ const team_employee = require('../companyModels/Team_Employee');
 const employee_dao = require('../company-daos/employees.dao');
 const department_dao = require('../company-daos/department.dao');
 const team_dao = require('../company-daos/team.dao');
+const position = require('../company-daos/position.dao');
 
 router.post("/", async (req, res) => {
     const dbInfo = req.body;
@@ -18,6 +19,7 @@ router.post("/", async (req, res) => {
             employees: [],
             teams: [],
             departments: [],
+            positions: [],
             checkConnection: {
                 status : '',
                 message : ''
@@ -41,6 +43,11 @@ router.post("/", async (req, res) => {
             var departmentResponse = await department_dao.findAllDepartmentToCheck(dbInfo);
             await departmentResponse.map(item => {
                 structure.departments.push(item);
+            });
+            //get positon
+            var positionResponse = await position.findAllPositionToCheck(dbInfo);
+            await positionResponse.map(item => {
+                structure.positions.push(item);
             })
 
 
