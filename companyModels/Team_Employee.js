@@ -6,7 +6,7 @@ const Team = require("../companyModels/Team");
 
 
 module.exports = {
-    EmpTeamModel: (db , emp, team) =>{
+    EmpTeamModel: (db, team, emp) =>{
         // const emp = Employee.EmpModel(db);
         // const team = Team.TeamModel(db);
         const Team_Employee = db.define(
@@ -30,6 +30,16 @@ module.exports = {
             }
         );
         
+        Team_Employee.belongsTo(emp, {
+            foreignKey: "employee_id",
+            sourceKey: "id"
+        });
+        emp.hasMany(Team_Employee, {
+            as: 'teams',
+            foreignKey: "employee_id",
+            sourceKey: "id"
+        });
+        
         Team_Employee.belongsTo(team, {
             as: 'members',
             foreignKey: "team_id",
@@ -38,15 +48,6 @@ module.exports = {
         team.hasMany(Team_Employee, {
             as: 'members',
             foreignKey: "team_id",
-            sourceKey: "id"
-        });
-        
-        Team_Employee.belongsTo(emp, {
-            foreignKey: "employee_id",
-            sourceKey: "id"
-        });
-        emp.hasMany(Team_Employee, {
-            foreignKey: "employee_id",
             sourceKey: "id"
         });
         return Team_Employee;
