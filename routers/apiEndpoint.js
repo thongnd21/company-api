@@ -145,6 +145,8 @@ router.get('/', async (req, res) => {
             });
             structure.positions = positionResponse;
             res.json(structure);
+        } else { 
+            return null;
         }
     } catch (error) {
         res.status(500).json("System error!" + error)

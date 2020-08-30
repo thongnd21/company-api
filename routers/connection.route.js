@@ -21,6 +21,7 @@ router.post("/", async (req, res) => {
             departments: {},
             positions: {},
             team_employee: {},
+            vacation_date: {},
             checkConnection: {
                 status: '',
                 message: ''
@@ -84,6 +85,9 @@ router.post("/", async (req, res) => {
                     }
                     if (result[i].TABLE_NAME == "position") {
                         structure.positions[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                    }
+                    if (result[i].TABLE_NAME == "vacation_date") {
+                        structure.vacation_date[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                     }
                 }
 
