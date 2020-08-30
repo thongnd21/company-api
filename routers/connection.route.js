@@ -22,6 +22,10 @@ router.post("/", async (req, res) => {
             positions: {},
             team_employee: {},
             vacation_date: {},
+            character_maximum_length_employee: {},
+            character_maximum_length_department: {},
+            character_maximum_length_team: {},
+            character_maximum_length_position: {},
             checkConnection: {
                 status: '',
                 message: ''
@@ -64,27 +68,109 @@ router.post("/", async (req, res) => {
             //     }
             // });
             // after connect, query get all information of tabel in db
-           
+
             await connectionString.query('select * from information_schema.columns where table_schema = ' + '"' + dbInfo.dbName + '"' + ' order by table_name,ordinal_position', (err, result, fields) => {
                 if (err) {
                     console.log(err);
                 }
-                console.log(result[1]);
+                console.log(result[1].CHARACTER_MAXIMUM_LENGTH);
                 for (var i = 0; i < result.length; i++) {
                     if (result[i].TABLE_NAME == "employee") {
-                        structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        if (result[i].COLUMN_NAME == "primary_email" && result[i].CHARACTER_MAXIMUM_LENGTH <= 254) {
+                            structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        } else if (result[i].COLUMN_NAME == "primary_email" && result[i].CHARACTER_MAXIMUM_LENGTH > 254) {
+                            structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+
+                        if (result[i].COLUMN_NAME == "personal_email" && result[i].CHARACTER_MAXIMUM_LENGTH <= 254) {
+                            structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        } else if (result[i].COLUMN_NAME == "personal_email" && result[i].CHARACTER_MAXIMUM_LENGTH > 254) {
+                            structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+
+                        if (result[i].COLUMN_NAME == "phone" && result[i].CHARACTER_MAXIMUM_LENGTH <= 15) {
+                            structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        } else if (result[i].COLUMN_NAME == "phone" && result[i].CHARACTER_MAXIMUM_LENGTH > 15) {
+                            structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+
+                        if (result[i].COLUMN_NAME == "first_name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 45) {
+                            structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        } else if (result[i].COLUMN_NAME == "first_name" && result[i].CHARACTER_MAXIMUM_LENGTH > 45) {
+                            structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+
+                        if (result[i].COLUMN_NAME == "last_name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 45) {
+                            structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        } else if (result[i].COLUMN_NAME == "last_name" && result[i].CHARACTER_MAXIMUM_LENGTH > 45) {
+                            structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+
+                        if (result[i].COLUMN_NAME == "address" && result[i].CHARACTER_MAXIMUM_LENGTH <= 512) {
+                            structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        } else if (result[i].COLUMN_NAME == "address" && result[i].CHARACTER_MAXIMUM_LENGTH > 512) {
+                            structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+
+                        if (result[i].COLUMN_NAME == "position_id") {
+                            structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+
+                        if (result[i].COLUMN_NAME == "department_id") {
+                            structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+
+                        if (result[i].COLUMN_NAME == "id") {
+                            structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
                     }
                     if (result[i].TABLE_NAME == "department") {
-                        structure.departments[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        if (result[i].COLUMN_NAME == "id") {
+                            structure.departments[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+
+                        if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 200) {
+                            structure.departments[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        } else if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH > 200) {
+                            structure.character_maximum_length_department[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+
+                        if (result[i].COLUMN_NAME == "email" && result[i].CHARACTER_MAXIMUM_LENGTH <= 254) {
+                            structure.departments[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        } else if (result[i].COLUMN_NAME == "email" && result[i].CHARACTER_MAXIMUM_LENGTH > 254) {
+                            structure.character_maximum_length_department[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
                     }
                     if (result[i].TABLE_NAME == "team") {
-                        structure.teams[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        if (result[i].COLUMN_NAME == "id") {
+                            structure.teams[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+
+                        if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 200) {
+                            structure.teams[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        } else if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH > 200) {
+                            structure.character_maximum_length_team[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+
+                        if (result[i].COLUMN_NAME == "email" && result[i].CHARACTER_MAXIMUM_LENGTH <= 254) {
+                            structure.teams[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        } else if (result[i].COLUMN_NAME == "email" && result[i].CHARACTER_MAXIMUM_LENGTH > 254) {
+                            structure.character_maximum_length_team[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
                     }
                     if (result[i].TABLE_NAME == "team_employee") {
                         structure.team_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                     }
                     if (result[i].TABLE_NAME == "position") {
-                        structure.positions[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        if (result[i].COLUMN_NAME == "id") {
+                            structure.positions[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+
+                        if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 200) {
+                            structure.positions[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        } else if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH > 200) {
+                            structure.character_maximum_length_position[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
                     }
                     if (result[i].TABLE_NAME == "vacation_date") {
                         structure.vacation_date[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
