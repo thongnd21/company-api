@@ -75,7 +75,7 @@ router.post("/", async (req, res) => {
                 }
                 console.log(result[1].CHARACTER_MAXIMUM_LENGTH);
                 for (var i = 0; i < result.length; i++) {
-                    if (result[i].TABLE_NAME == "employee") {
+                    if (result[i].TABLE_NAME == "gmhrs_employee_view") {
                         if (result[i].COLUMN_NAME == "primary_email" && result[i].CHARACTER_MAXIMUM_LENGTH <= 254) {
                             structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                         } else if (result[i].COLUMN_NAME == "primary_email" && result[i].CHARACTER_MAXIMUM_LENGTH > 254) {
@@ -124,7 +124,7 @@ router.post("/", async (req, res) => {
                             structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                         }
                     }
-                    if (result[i].TABLE_NAME == "department") {
+                    if (result[i].TABLE_NAME == "gmhrs_department_view") {
                         if (result[i].COLUMN_NAME == "id") {
                             structure.departments[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                         }
@@ -141,7 +141,7 @@ router.post("/", async (req, res) => {
                             structure.character_maximum_length_department[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                         }
                     }
-                    if (result[i].TABLE_NAME == "team") {
+                    if (result[i].TABLE_NAME == "gmhrs_team_view") {
                         if (result[i].COLUMN_NAME == "id") {
                             structure.teams[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                         }
@@ -158,10 +158,10 @@ router.post("/", async (req, res) => {
                             structure.character_maximum_length_team[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                         }
                     }
-                    if (result[i].TABLE_NAME == "team_employee") {
+                    if (result[i].TABLE_NAME == "gmhrs_team_employee_view") {
                         structure.team_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                     }
-                    if (result[i].TABLE_NAME == "position") {
+                    if (result[i].TABLE_NAME == "gmhrs_position_view") {
                         if (result[i].COLUMN_NAME == "id") {
                             structure.positions[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                         }
@@ -172,7 +172,7 @@ router.post("/", async (req, res) => {
                             structure.character_maximum_length_position[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                         }
                     }
-                    if (result[i].TABLE_NAME == "vacation_date") {
+                    if (result[i].TABLE_NAME == "gmhrs_vacation_date_view") {
                         structure.vacation_date[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
                     }
                 }

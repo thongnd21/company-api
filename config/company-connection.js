@@ -21,9 +21,9 @@ module.exports = {
 
     },
     dbConnectionGmHRS: () => {
-        return new Sequelize('gmhrs', 'root', 'Z@123456', {
-            // host: '103.143.209.237',
-            host: 'localhost',
+        return new Sequelize('gmhrs', 'root', 'Zz@123456', {
+            host: '103.143.209.237',
+            // host: 'localhost',
             dialect: 'mysql',
             port: 3306,
             logging: false,

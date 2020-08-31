@@ -4,7 +4,7 @@ const db = require('./../config/company-connection');
 module.exports = {
     DepModel: (db) =>{
         const Department = db.define(
-            "department",
+            "gmhrs_department_view",
                 {
                     id: {
                         type: Sequelize.INTEGER,

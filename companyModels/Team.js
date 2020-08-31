@@ -4,7 +4,7 @@ const Employee = require('./Employees');
 module.exports = {
     TeamModel: (db) =>{
         const Team = db.define(
-                "team",
+                "gmhrs_team_view",
                 {
                     id: {
                         type: Sequelize.INTEGER,

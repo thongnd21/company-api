@@ -10,7 +10,7 @@ module.exports = {
         const dep = Department.DepModel(db);
         const postion = Position.PositionModel(db);
         const Employee = db.define(
-            "employee",
+            "gmhrs_employee_view",
             {
                 id: {
                     type: Sequelize.INTEGER,

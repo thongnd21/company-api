@@ -6,7 +6,7 @@ module.exports = {
 
         const emp = Employees.EmpModel(db);
         const Vacation_Employee = db.define(
-            "vacation_date",
+            "gmhrs_vacation_date_view",
             {
                 id: {
                     type: Sequelize.INTEGER,

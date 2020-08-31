@@ -10,7 +10,7 @@ module.exports = {
         // const emp = Employee.EmpModel(db);
         // const team = Team.TeamModel(db);
         const Team_Employee = db.define(
-            "team_employee",
+            "gmhrs_team_employee_view",
             {
                 employee_id: {
                     type: Sequelize.INTEGER,
