@@ -31,6 +31,7 @@ module.exports = {
         );
         
         Team_Employee.belongsTo(emp, {
+            as: 'employee',
             foreignKey: "employee_id",
             sourceKey: "id"
         });

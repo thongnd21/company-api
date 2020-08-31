@@ -8,6 +8,7 @@ const Team_Employee = require("./../companyModels/Team_Employee");
 const Position = require("./../companyModels/Positon");
 const Vacation = require("./../companyModels/Vacation_Employee");
 const Sequelize = require("sequelize");
+const sequelize = require("sequelize");
 const Op = Sequelize.Op;
 const sql_connection = require('mysql');
 const testConnectionDao = require("../company-daos/testConnection.dao");
@@ -60,7 +61,6 @@ router.get('/', async (req, res) => {
             const pos =  Position.PositionModel(connectionString);
             const vac =  Vacation.VacationEmployeModel(connectionString);
             const team_emp =  Team_Employee.EmpTeamModel(connectionString, team, emp);
-
             var structure = {
                 employees: [],
                 teams: [],
@@ -68,7 +68,6 @@ router.get('/', async (req, res) => {
                 positions: []
             }
             //get employees
-            // var employeeResponse = await Employee.EmpModel(connectionString);
             var employeeResponse = await emp.findAll({
                 attributes: ['id', 'primary_email', 'personal_email',
                     'first_name', 'last_name', 'modified_date', 'address', 'position_id',
@@ -76,7 +75,16 @@ router.get('/', async (req, res) => {
                 include: [
                     {
                         model: dep,
-                        attributes: ['id', 'name'],
+                        as: 'department',
+                        attributes: ['id', 'name', 'email'],
+                    },
+                    {
+                        model: team_emp,
+                        as: 'teams',
+                        attributes: ['team_id'],
+                        order: [
+                            ['team_id', 'ASC']
+                        ]
                     }
                 ],
                 order: [
@@ -84,15 +92,10 @@ router.get('/', async (req, res) => {
                 ],
                 where: { status_id: 1 }
             });
-
-            var today = new Date();
-            var vacation = await vac.findAll({
-                where: {
-                    [Op.or]: [{ start_date: { [Op.eq]: today.toISOString().substring(0, 10) } }, { start_date: { [Op.gt]: today.toISOString().substring(0, 10) } }]
-                },
-                order: [['start_date', 'ASC']]
-            });
-            console.log(today.toISOString().substring(0, 10));
+    
+            const sql = "SELECT id, created_date, employee_id, start_date, end_date FROM vacation_date AS vacation_date WHERE (current_date() between date(vacation_date.start_date) and date(vacation_date.end_date)) OR date(vacation_date.start_date) >= current_date() ORDER BY vacation_date.start_date DESC";
+            const vacation = await vac.sequelize.query(sql, { type: sequelize.QueryTypes.SELECT });
+            // console.log(today.toISOString().substring(0, 10));
             if (vacation.length > 0) {
                 for (let i = 0; i < employeeResponse.length; i++) {
                     for (let j = 0; j < vacation.length; j++) {
@@ -104,8 +107,9 @@ router.get('/', async (req, res) => {
                 }
             }
             console.log("----Get all employee from HRMS---");
-
+    
             structure.employees = employeeResponse;
+    
             var teamResponse = await team.findAll({
                 include: [
                     {
@@ -116,8 +120,10 @@ router.get('/', async (req, res) => {
                             {
                                 attributes: ['primary_email', ['id', 'employee_id']],
                                 model: emp,
+                                as: 'employee',
                                 order: [['id', 'ASC']],
                                 // where: { status_id: 1 }
+    
                             }
                         ]
                     }],
@@ -127,9 +133,9 @@ router.get('/', async (req, res) => {
                 order: [['email', "ASC"]]
             }
             );
-
+    
             structure.teams = [...structure.teams, ...teamResponse];
-
+    
             // get derpartments
             var departmentResponse = await dep.findAll({
                 where: {
@@ -144,13 +150,13 @@ router.get('/', async (req, res) => {
                 order: [['name', 'ASC']]
             });
             structure.positions = positionResponse;
+    
+    
             res.json(structure);
-        } else { 
-            return null;
+        } 
+    }catch (error) {
+            res.status(500).json("System error!" + error)
         }
-    } catch (error) {
-        res.status(500).json("System error!" + error)
-    }
-});
-
-module.exports = router;
+    });
+    
+    module.exports = router;

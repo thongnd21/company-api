@@ -58,10 +58,12 @@ module.exports = {
             }
         );
         Employee.belongsTo(dep, {
+            as: 'department',
             foreignKey: "department_id",
             sourceKey: "id"
         });
         dep.hasMany(Employee, {
+            as: 'department',
             foreignKey: "department_id",
             sourceKey: "id"
         });
