@@ -85,7 +85,12 @@ router.get('/', async (req, res) => {
                         order: [
                             ['team_id', 'ASC']
                         ]
-                    }
+                    },
+                    {
+                        model: pos,
+                        as: 'position',
+                        attributes: ['id', 'name'],
+                    },
                 ],
                 order: [
                     ['primary_email', 'ASC']
