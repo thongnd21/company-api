@@ -33,6 +33,12 @@ router.post("/", async (req, res) => {
             }
         }
         console.log(dbInfo);
+        if (dbInfo.dialect == "mssql" && dbInfo.port == "3306") {
+            structure.checkConnection.status = "fail";
+            structure.checkConnection.message = "Wrong port, please input again!";
+            res.json(structure);
+            return;
+        }
         var check = await testConnectionDao.checkConnection(dbInfo);
         if (check === true) {
 
