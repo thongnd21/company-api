@@ -55,11 +55,11 @@ router.get('/', async (req, res) => {
                     idle: 10000
                 }
             })
-            const emp = Employee.EmpModel(connectionString);
+            const vac =  Vacation.VacationEmployeModel(connectionString);
             const team =  Team.TeamModel(connectionString);
             const dep =  Department.DepModel(connectionString);
             const pos =  Position.PositionModel(connectionString);
-            const vac =  Vacation.VacationEmployeModel(connectionString);
+            const emp = Employee.EmpModel(connectionString);
             const team_emp =  Team_Employee.EmpTeamModel(connectionString, team, emp);
             var structure = {
                 employees: [],
@@ -113,7 +113,7 @@ router.get('/', async (req, res) => {
             }
             console.log("----Get all employee from HRMS---");
     
-            structure.employees = employeeResponse;
+            structure.employees = [...structure.employees, ...employeeResponse];;
     
             var teamResponse = await team.findAll({
                 include: [

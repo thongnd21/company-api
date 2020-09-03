@@ -57,6 +57,16 @@ module.exports = {
                 freezeTableName: true
             }
         );
+        Employee.belongsTo(postion, {
+            as: 'position',
+            foreignKey: "position_id",
+            sourceKey: "id"
+        });
+        postion.hasMany(Employee, {
+            as: 'position',
+            foreignKey: "position_id",
+            sourceKey: "id"
+        });
         Employee.belongsTo(dep, {
             as: 'department',
             foreignKey: "department_id",
@@ -76,14 +86,6 @@ module.exports = {
             through: "team_employee",
             as: "team",
             foreignKey: "employee_id"
-        });
-        Employee.belongsTo(postion, {
-            foreignKey: "position_id",
-            sourceKey: "id"
-        });
-        postion.hasMany(Employee, {
-            foreignKey: "position_id",
-            sourceKey: "id"
         });
         return Employee;
     }
