@@ -17,16 +17,7 @@ router.post("/", async (req, res) => {
     try {
 
         var structure = {
-            // employees: {},
-            // teams: {},
-            // departments: {},
-            // positions: {},
-            // team_employee: {},
-            // vacation_date: {},
-            // character_maximum_length_employee: {},
-            // character_maximum_length_department: {},
-            // character_maximum_length_team: {},
-            // character_maximum_length_position: {},
+            table: null,
             checkConnection: {
                 status: '',
                 message: ''
@@ -220,8 +211,9 @@ router.post("/", async (req, res) => {
                         listTable.push(table);
                     }
 
-                    console.log("tables: ");
-                    console.log(listTable);
+                    structure.table = listTable;
+                    // console.log("tables: ");
+                    // console.log(listTable);
                     // for (let i = 0; i < result.length; i++) {
                     //     if (tableName[result[i].TABLE_NAME] = result[i].TABLE_NAME) {
                     //         tableName[result[i].TABLE_NAME][result[i].COLUMN_NAME] = result[i].COLUMN_NAME
@@ -235,7 +227,7 @@ router.post("/", async (req, res) => {
                         }
                     })
                     // console.log(tableName);
-                    res.json(listTable);
+                    res.json(structure);
                     return;
                 })
 
