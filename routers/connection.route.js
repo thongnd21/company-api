@@ -72,7 +72,6 @@ router.post("/", async (req, res) => {
                     if (err) {
                         console.log(err);
                     }
-                    console.log(result);
                     // for (var i = 0; i < result.length; i++) {
                     //     if (result[i].TABLE_NAME == "gmhrs_employee_view") {
                     //         if (result[i].COLUMN_NAME == "primary_email" && result[i].CHARACTER_MAXIMUM_LENGTH <= 254) {
@@ -410,7 +409,167 @@ router.post("/", async (req, res) => {
 
 
 
-router.get("/", async (req, res) => {
+router.put("/", async (req, res) => {
+    const dbInfo = {
+        dbName: 'hrms',
+        host: '103.143.209.237',
+        port: '3306',
+        username: 'hrms',
+        password: 'Zz@123456',
+        dialect: 'mysql'
+    }
+    var mappingResult = [
+        {
+            tableGM: "gmhrs_employee_view",
+            tableHR:
+            {
+                nametableHR: "gmhrs_employee_view",
+                fields: [
+                    { id: "" },
+                    { primary_email: "" },
+                    { personal_email: "" },
+                    { first_name: "" },
+                    { last_name: "" },
+                    { phone: "" },
+                    { address: "" },
+                    { position_id: "" },
+                    { department_id: "" }
+                ]
+
+            }
+        },
+        {
+            tableGM: "gmhrs_department_view",
+            tableHR:
+            {
+                nametableHR: "",
+                fields: [
+                    { id: "" },
+                    { name: "" },
+                    { email: "" }
+                ]
+            }
+        },
+        {
+            tableGM: "gmhrs_team_view",
+            tableHR:
+            {
+                nametableHR: "",
+                fields: [
+                    { id: "" },
+                    { name: "" },
+                    { email: "" }
+                ]
+            }
+        },
+        {
+            tableGM: "gmhrs_team_employee_view",
+            tableHR:
+            {
+                nametableHR: "",
+                fields: [
+                    { employee_id: "" },
+                    { team_id: "" },
+                ]
+            }
+        },
+        {
+            tableGM: "gmhrs_position_view",
+            tableHR:
+            {
+                nametableHR: "",
+                fields: [
+                    { id: "" },
+                    { name: "" }
+                ]
+            }
+        },
+        {
+            tableGM: "gmhrs_vacation_date_view",
+            tableHR:
+            {
+                nametableHR: "",
+                fields: [
+                    { employee_id: "" },
+                    { start_date: "" },
+                    { end_date: "" }
+                ]
+
+            }
+        }
+    ]
+    console.log(req.body);
+    try {
+        var check = await testConnectionDao.checkConnection(dbInfo);
+        console.log(check);
+        if (check === true) {
+            const connectionString = sql_connection.createConnection({
+                host: dbInfo.host,
+                user: dbInfo.username,
+                password: dbInfo.password,
+                database: dbInfo.dbName,
+                port: dbInfo.port,
+                timestamps: false,
+                pool: {
+                    max: 5,
+                    min: 0,
+                    acquire: 30000,
+                    idle: 10000
+                }
+            })
+            // connect db
+            await connectionString.connect(function (err) {
+                if (err) throw err;
+                console.log('error when connecting to db:', err);
+            });
+            // on connect if db has been losed, we will reconnect
+            // connectionString.on('error', function (err) {
+            //     console.log('db error', err);
+            //     if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+            //         console.log(dbInfo);
+            //         checkConnection(newConnection);
+            //     } else {
+            //         throw err;
+            //     }
+            // });
+            // after connect, query get all information of tabel in db
+
+
+            var empQuery = " SELECT employee.id, employee.primary_email, employee.personal_email, employee.first_name, employee.last_name, " +
+                "employee.modified_date, employee.address, employee.position_id, employee.department_id, employee.phone, employee.status_id, " +
+                "employee.vacation_start_date, employee.vacation_end_date, department.id AS 'department.id', department.name AS 'department.name', " +
+                "department.email AS 'department.email' , position.id AS 'position.id' , position.name AS 'position.name' , teams.employee_id " +
+                "AS 'teams.employee_id', teams.team_id AS 'teams.team_id' " +
+                "FROM " + mappingResult[0].tableHR.nametableHR + " AS employee " +
+                "LEFT OUTER JOIN " + mappingResult[1].tableHR.nametableHR + " AS department ON employee.department_id = department.id " +
+                "LEFT OUTER JOIN " + mappingResult[4].tableHR.nametableHR + " AS position ON employee.position_id = position.id " +
+                "LEFT OUTER JOIN " + mappingResult[3].tableHR.nametableHR + " AS teams ON employee.id = teams.employee_id " +
+                "WHERE employee.status_id = 1 ORDER BY employee.primary_email ASC; "
+
+            console.log(empQuery);
+            // 'SELECT' + 'employee'+'.'+`id`+','+ `employee`+'.'+'primary_email'+','+ 'employee'+'.'+'personal_email'+','+'employee'+'.'+'first_name'+','+ 
+            // 'employee'+'.'+'last_name'+','+`employee`.`modified_date`, `employee`.`address`, `employee`.`position_id`, `employee`.`department_id`, `employee`.`phone`, `employee`.`status_id`, `employee`.`vacation_start_date`, `employee`.`vacation_end_date`, `department`.`id` AS`department.id`, `department`.`name` AS`department.name`, `department`.`email` AS`department.email`, `position`.`id` AS`position.id`, `position`.`name` AS`position.name`, `teams`.`employee_id` AS`teams.employee_id`, `teams`.`team_id` AS`teams.team_id` FROM`employee` AS`employee` LEFT OUTER JOIN`department` AS`department` ON`employee`.`department_id` = `department`.`id` LEFT OUTER JOIN`position` AS`position` ON`employee`.`position_id` = `position`.`id` LEFT OUTER JOIN`team_employee` AS`teams` ON`employee`.`id` = `teams`.`employee_id` WHERE`employee`.`status_id` = 1 ORDER BY`employee`.`primary_email` ASC;
+
+            // await connectionString.query(empQuery, (err, result, fields) => {
+            //     if (err) {
+            //         console.log(err);
+            //     }
+            //     console.log(result);
+            //     connectionString.destroy(function (err) {
+            //         if (err) {
+            //             console.log(err);
+            //         }
+            //     })
+            //     // console.log(tableName);
+            //     return;
+            // })
+        }
+    } catch (error) {
+        console.log(error);
+        res.send("Server unavailable!")
+    }
+
+
 
 })
 module.exports = router;
