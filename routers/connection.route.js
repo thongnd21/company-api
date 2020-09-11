@@ -418,88 +418,100 @@ router.put("/", async (req, res) => {
         password: 'Zz@123456',
         dialect: 'mysql'
     }
-    var mappingResult = [
-        {
-            tableGM: "gmhrs_employee_view",
-            tableHR:
-            {
-                nametableHR: "gmhrs_employee_view",
-                fields: [
-                    { id: "" },
-                    { primary_email: "" },
-                    { personal_email: "" },
-                    { first_name: "" },
-                    { last_name: "" },
-                    { phone: "" },
-                    { address: "" },
-                    { position_id: "" },
-                    { department_id: "" }
-                ]
 
-            }
-        },
-        {
-            tableGM: "gmhrs_department_view",
-            tableHR:
-            {
-                nametableHR: "",
-                fields: [
-                    { id: "" },
-                    { name: "" },
-                    { email: "" }
-                ]
-            }
-        },
-        {
-            tableGM: "gmhrs_team_view",
-            tableHR:
-            {
-                nametableHR: "",
-                fields: [
-                    { id: "" },
-                    { name: "" },
-                    { email: "" }
-                ]
-            }
-        },
-        {
-            tableGM: "gmhrs_team_employee_view",
-            tableHR:
-            {
-                nametableHR: "",
-                fields: [
-                    { employee_id: "" },
-                    { team_id: "" },
-                ]
-            }
-        },
-        {
-            tableGM: "gmhrs_position_view",
-            tableHR:
-            {
-                nametableHR: "",
-                fields: [
-                    { id: "" },
-                    { name: "" }
-                ]
-            }
-        },
-        {
-            tableGM: "gmhrs_vacation_date_view",
-            tableHR:
-            {
-                nametableHR: "",
-                fields: [
-                    { employee_id: "" },
-                    { start_date: "" },
-                    { end_date: "" }
-                ]
-
-            }
-        }
-    ]
     console.log(req.body);
+    const mappingReq = req.body
     try {
+        // for(let i = 0 ; i <mappingReq.length;i++){
+        //     mappingResult[i].tableHR.nametableHR=mappingReq[i].tableHR.nametableHR
+        //     for(let j = 0; j<mappingReq[i].fields.length;j++){
+        //         var fields = {
+
+        //         }
+        //     }
+        // }
+        var mappingResult = [
+            {
+                tableGM: "gmhrs_employee_view",
+                tableHR:
+                {
+                    nametableHR: mappingReq[0].tableHR.nametableHR,
+                    fields: {
+                        id: mappingReq[0].tableHR.fields[0].id,
+                        primary_email: mappingReq[0].tableHR.fields[1].primary_email,
+                        personal_email: mappingReq[0].tableHR.fields[2].personal_email,
+                        first_name: mappingReq[0].tableHR.fields[3].first_name,
+                        last_name: mappingReq[0].tableHR.fields[4].last_name,
+                        phone: mappingReq[0].tableHR.fields[5].phone,
+                        address: mappingReq[0].tableHR.fields[6].address,
+                        position_id: mappingReq[0].tableHR.fields[7].position_id,
+                        department_id: mappingReq[0].tableHR.fields[8].department_id
+                    }
+                }
+            },
+            {
+                tableGM: "gmhrs_department_view",
+                tableHR:
+                {
+                    nametableHR: mappingReq[1].tableHR.nametableHR,
+                    fields:
+                    {
+                        id: mappingReq[1].tableHR.fields[0].id,
+                        name: mappingReq[1].tableHR.fields[1].name,
+                        email: mappingReq[1].tableHR.fields[2].email
+                    }
+
+                }
+            },
+            {
+                tableGM: "gmhrs_team_view",
+                tableHR:
+                {
+                    nametableHR: mappingReq[2].tableHR.nametableHR,
+                    fields: [
+                        { id: "" },
+                        { name: "" },
+                        { email: "" }
+                    ]
+                }
+            },
+            {
+                tableGM: "gmhrs_team_employee_view",
+                tableHR:
+                {
+                    nametableHR: mappingReq[3].tableHR.nametableHR,
+                    fields: [
+                        { employee_id: "" },
+                        { team_id: "" },
+                    ]
+                }
+            },
+            {
+                tableGM: "gmhrs_position_view",
+                tableHR:
+                {
+                    nametableHR: mappingReq[4].tableHR.nametableHR,
+                    fields: [
+                        { id: "" },
+                        { name: "" }
+                    ]
+                }
+            },
+            {
+                tableGM: "gmhrs_vacation_date_view",
+                tableHR:
+                {
+                    nametableHR: mappingReq[5].tableHR.nametableHR,
+                    fields: [
+                        { employee_id: "" },
+                        { start_date: "" },
+                        { end_date: "" }
+                    ]
+
+                }
+            }
+        ]
+        console.log(mappingResult[0].tableHR.fields);
         var check = await testConnectionDao.checkConnection(dbInfo);
         console.log(check);
         if (check === true) {
@@ -522,47 +534,132 @@ router.put("/", async (req, res) => {
                 if (err) throw err;
                 console.log('error when connecting to db:', err);
             });
-            // on connect if db has been losed, we will reconnect
-            // connectionString.on('error', function (err) {
-            //     console.log('db error', err);
-            //     if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-            //         console.log(dbInfo);
-            //         checkConnection(newConnection);
-            //     } else {
-            //         throw err;
-            //     }
-            // });
-            // after connect, query get all information of tabel in db
-
-
-            var empQuery = " SELECT employee.id, employee.primary_email, employee.personal_email, employee.first_name, employee.last_name, " +
-                "employee.modified_date, employee.address, employee.position_id, employee.department_id, employee.phone, employee.status_id, " +
-                "employee.vacation_start_date, employee.vacation_end_date, department.id AS 'department.id', department.name AS 'department.name', " +
-                "department.email AS 'department.email' , position.id AS 'position.id' , position.name AS 'position.name' , teams.employee_id " +
-                "AS 'teams.employee_id', teams.team_id AS 'teams.team_id' " +
+            var empQuery = " SELECT employee." + mappingResult[0].tableHR.fields.id + " , employee." + mappingResult[0].tableHR.fields.primary_email + ", employee." + mappingResult[0].tableHR.fields.personal_email + ", employee." + mappingResult[0].tableHR.fields.first_name + ", employee." + mappingResult[0].tableHR.fields.last_name + ", " +
+                "employee.modified_date, employee." + mappingResult[0].tableHR.fields.address + ", employee." + mappingResult[0].tableHR.fields.position_id + ", employee." + mappingResult[0].tableHR.fields.department_id + ", employee." + mappingResult[0].tableHR.fields.phone + ", employee.status_id, " +
+                "employee.vacation_start_date, employee.vacation_end_date, department.id AS departmentId, department.name AS department_name, " +
+                "department.email AS department_email , position.id AS position_id , position.name AS position_name , teams.employee_id " +
+                "AS teams_employee_id, teams.team_id AS teams_team_id " +
                 "FROM " + mappingResult[0].tableHR.nametableHR + " AS employee " +
-                "LEFT OUTER JOIN " + mappingResult[1].tableHR.nametableHR + " AS department ON employee.department_id = department.id " +
-                "LEFT OUTER JOIN " + mappingResult[4].tableHR.nametableHR + " AS position ON employee.position_id = position.id " +
+                "LEFT OUTER JOIN " + mappingResult[1].tableHR.nametableHR + " AS department ON employee." + mappingResult[0].tableHR.fields.department_id + " = department." + mappingResult[1].tableHR.fields.id + " " +
+                "LEFT OUTER JOIN " + mappingResult[4].tableHR.nametableHR + " AS position ON employee." + mappingResult[0].tableHR.fields.position_id + " = position.id " +
                 "LEFT OUTER JOIN " + mappingResult[3].tableHR.nametableHR + " AS teams ON employee.id = teams.employee_id " +
-                "WHERE employee.status_id = 1 ORDER BY employee.primary_email ASC; "
+                "WHERE employee.status_id = 1 ORDER BY employee.primary_email ASC "
 
             console.log(empQuery);
-            // 'SELECT' + 'employee'+'.'+`id`+','+ `employee`+'.'+'primary_email'+','+ 'employee'+'.'+'personal_email'+','+'employee'+'.'+'first_name'+','+ 
-            // 'employee'+'.'+'last_name'+','+`employee`.`modified_date`, `employee`.`address`, `employee`.`position_id`, `employee`.`department_id`, `employee`.`phone`, `employee`.`status_id`, `employee`.`vacation_start_date`, `employee`.`vacation_end_date`, `department`.`id` AS`department.id`, `department`.`name` AS`department.name`, `department`.`email` AS`department.email`, `position`.`id` AS`position.id`, `position`.`name` AS`position.name`, `teams`.`employee_id` AS`teams.employee_id`, `teams`.`team_id` AS`teams.team_id` FROM`employee` AS`employee` LEFT OUTER JOIN`department` AS`department` ON`employee`.`department_id` = `department`.`id` LEFT OUTER JOIN`position` AS`position` ON`employee`.`position_id` = `position`.`id` LEFT OUTER JOIN`team_employee` AS`teams` ON`employee`.`id` = `teams`.`employee_id` WHERE`employee`.`status_id` = 1 ORDER BY`employee`.`primary_email` ASC;
+            var employeeResponse;
+            var employeeResult
+            await connectionString.query(empQuery, (err, result, fields) => {
+                if (err) {
+                    console.log(err);
+                }
+                employeeResponse = result;
 
-            // await connectionString.query(empQuery, (err, result, fields) => {
-            //     if (err) {
-            //         console.log(err);
-            //     }
-            //     console.log(result);
-            //     connectionString.destroy(function (err) {
-            //         if (err) {
-            //             console.log(err);
-            //         }
-            //     })
-            //     // console.log(tableName);
-            //     return;
-            // })
+                employeeResult = [
+                    {
+                        id: employeeResponse[0].id,
+                        primary_email: employeeResponse[0].primary_email,
+                        personal_email: employeeResponse[0].personal_email,
+                        first_name: employeeResponse[0].first_name,
+                        last_name: employeeResponse[0].last_name,
+                        modified_date: employeeResponse[0].modified_date,
+                        address: employeeResponse[0].modified_date,
+                        position_id: employeeResponse[0].position_id,
+                        department_id: employeeResponse[0].department_id,
+                        phone: employeeResponse[0].phone,
+                        status_id: employeeResponse[0].status_id,
+                        vacation_start_date: employeeResponse[0].vacation_start_date,
+                        vacation_end_date: employeeResponse[0].vacation_end_date,
+                        department: {
+                            id: employeeResponse[0].departmentId,
+                            name: employeeResponse[0].department_name,
+                            email: employeeResponse[0].department_email
+                        },
+                        position: {
+                            id: employeeResponse[0].position_id,
+                            name: employeeResponse[0].position_name
+                        },
+                        teams: [
+
+                        ]
+                    }
+                ]
+                var index = 0
+                while (index < employeeResponse.length) {
+                    var teamLength = 0;
+                    for (let i = 0; i < employeeResponse.length; i++) {
+                        if (employeeResult[teamLength].id === employeeResponse[i].id) {
+                            var teamid = { team_id: employeeResponse[i].teams_team_id };
+                            employeeResult[teamLength].teams.push(teamid);
+                            index = index + 1;
+                        } else if (employeeResult[teamLength].id !== employeeResponse[i].id) {
+                            var newEmp = {
+                                id: employeeResponse[i].id,
+                                primary_email: employeeResponse[i].primary_email,
+                                personal_email: employeeResponse[i].personal_email,
+                                first_name: employeeResponse[i].first_name,
+                                last_name: employeeResponse[i].last_name,
+                                modified_date: employeeResponse[i].modified_date,
+                                address: employeeResponse[i].modified_date,
+                                position_id: employeeResponse[i].position_id,
+                                department_id: employeeResponse[i].department_id,
+                                phone: employeeResponse[i].phone,
+                                status_id: employeeResponse[i].status_id,
+                                vacation_start_date: employeeResponse[i].vacation_start_date,
+                                vacation_end_date: employeeResponse[i].vacation_end_date,
+                                department: {
+                                    id: employeeResponse[i].departmentId,
+                                    name: employeeResponse[i].department_name,
+                                    email: employeeResponse[i].department_email
+                                },
+                                position: {
+                                    id: employeeResponse[i].position_id,
+                                    name: employeeResponse[i].position_name
+                                },
+                                teams: [
+                                    { team_id: employeeResponse[i].teams_team_id }
+                                ]
+                            }
+                            employeeResult.push(newEmp);
+                            teamLength = teamLength + 1;
+                            index = index + 1;
+                        }
+                    }
+                }
+
+
+
+                // console.log(today.toISOString().substring(0, 10));
+
+                // connectionString.destroy(function (err) {
+                //     if (err) {
+                //         console.log(err);
+                //     }
+                // })
+
+
+            })
+
+
+            const sql = "SELECT id, created_date, employee_id, start_date, end_date FROM vacation_date AS vacation_date WHERE (current_date() between date(vacation_date.start_date) and date(vacation_date.end_date)) OR date(vacation_date.start_date) >= current_date() ORDER BY vacation_date.start_date DESC";
+            await connectionString.query(sql, (err, result, fields) => {
+                if (err) {
+                    console.log(err);
+                }
+                console.log(result);
+                if (result.length > 0) {
+                    for (let i = 0; i < employeeResult.length; i++) {
+                        for (let j = 0; j < result.length; j++) {
+                            if (employeeResult[i].id === result[j].employee_id) {
+                                employeeResult[i].vacation_start_date = result[j].start_date;
+                                employeeResult[i].vacation_end_date = result[j].end_date;
+                            }
+                        }
+                    }
+                }
+                console.log(employeeResult);
+            })
+
+
         }
     } catch (error) {
         console.log(error);
