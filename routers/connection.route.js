@@ -498,7 +498,6 @@ router.put("/", async (req, res) => {
                         id: mappingReq[4].tableHR.fields[0].id,
                         name: mappingReq[4].tableHR.fields[1].name
                     }
-
                 }
             },
             {
@@ -558,7 +557,6 @@ router.put("/", async (req, res) => {
                     console.log(err);
                 }
                 employeeResponse = result;
-
                 employeeResult = [
                     {
                         id: employeeResponse[0][mappingResult[0].tableHR.fields.id],
@@ -646,11 +644,11 @@ router.put("/", async (req, res) => {
             })
 
 
-            const sql = "SELECT " + mappingResult[5].tableHR.fields.employee_id + ", " + mappingResult[5].tableHR.fields.start_date + ", " + mappingResult[5].tableHR.fields.end_date +
+            const vacationQuery = "SELECT " + mappingResult[5].tableHR.fields.employee_id + ", " + mappingResult[5].tableHR.fields.start_date + ", " + mappingResult[5].tableHR.fields.end_date +
                 " FROM " + mappingResult[5].tableHR.nametableHR + " AS vacation_date WHERE (current_date() between date(vacation_date." + mappingResult[5].tableHR.fields.start_date +
                 ") and date(vacation_date." + mappingResult[5].tableHR.fields.end_date + ")) OR date(vacation_date." + mappingResult[5].tableHR.fields.start_date + ") >= current_date() ORDER BY vacation_date." + mappingResult[5].tableHR.fields.start_date + " DESC";
             console.log(sql);
-            await connectionString.query(sql, (err, result, fields) => {
+            await connectionString.query(vacationQuery, (err, result, fields) => {
                 if (err) {
                     console.log(err);
                 }
@@ -665,7 +663,6 @@ router.put("/", async (req, res) => {
                         }
                     }
                 }
-                console.log(employeeResult);
                 data.employees = employeeResult
             })
 
@@ -680,16 +677,16 @@ router.put("/", async (req, res) => {
                 var department = [];
                 for (let i = 0; i < result.length; i++) {
                     var dep = {
-                        id: result[i].id,
-                        name: result[i].name,
-                        email: result[i].email
+                        id: result[i][mappingResult[1].tableHR.fields.id],
+                        name: result[i][mappingResult[1].tableHR.fields.name],
+                        email: result[i][mappingResult[1].tableHR.fields.email]
                     }
                     department.push(dep)
                 }
                 data.departments = department
             })
 
-
+            //position
             const positionQuery = "SELECT " + mappingResult[4].tableHR.fields.id + ", " + mappingResult[4].tableHR.fields.name +
                 " FROM " + mappingResult[4].tableHR.nametableHR + " AS position ORDER BY position." + mappingResult[4].tableHR.fields.name + " ASC";
             await connectionString.query(positionQuery, (err, result, fields) => {
@@ -699,15 +696,83 @@ router.put("/", async (req, res) => {
                 var position = [];
                 for (let i = 0; i < result.length; i++) {
                     var pos = {
-                        id: result[i].id,
-                        name: result[i].name,
+                        id: result[i][mappingResult[4].tableHR.fields.id],
+                        name: result[i][mappingResult[4].tableHR.fields.name],
                     }
                     position.push(pos)
                 }
                 data.positions = position
-                console.log(data);
+                // console.log(data);
             })
 
+            //team
+            const teamQuery = "SELECT team." + mappingResult[2].tableHR.fields.id + ", team." + mappingResult[2].tableHR.fields.name + ", team." + mappingResult[2].tableHR.fields.email + ", team.created_date, team.status_id, team.modified_date, team.description, " +
+                "members." + mappingResult[3].tableHR.fields.team_id + " AS members_team_id, members." + mappingResult[3].tableHR.fields.employee_id + " AS members_employee_id, members.modified_date AS members_modified_date, " +
+                "`members->" + mappingResult[0].tableHR.nametableHR + "`." + mappingResult[0].tableHR.fields.id + " AS members_employee_id, `members->" + mappingResult[0].tableHR.nametableHR + "`." + mappingResult[0].tableHR.fields.primary_email + " AS members_employee_primary_email, `members->" + mappingResult[0].tableHR.nametableHR + "`." + mappingResult[0].tableHR.fields.id + " " +
+                "AS members_employee_employee_id FROM " + mappingResult[2].tableHR.nametableHR + " AS team LEFT OUTER JOIN " + mappingResult[3].tableHR.nametableHR + " AS members ON team." + mappingResult[2].tableHR.fields.id + " = members.team_id " +
+                "LEFT OUTER JOIN " + mappingResult[0].tableHR.nametableHR + " AS `members->" + mappingResult[0].tableHR.nametableHR + "` ON members." + mappingResult[3].tableHR.fields.employee_id + " = `members->" + mappingResult[0].tableHR.nametableHR + "`." + mappingResult[0].tableHR.fields.id + " WHERE team.status_id = 1 ORDER BY team." + mappingResult[2].tableHR.fields.email + " ASC"
+            console.log(teamQuery);
+            await connectionString.query(teamQuery, (err, result, fields) => {
+                if (err) {
+                    console.log(err);
+                }
+                var teamResult = [
+                    {
+                        id: result[0][mappingResult[2].tableHR.fields.id],
+                        name: result[0][mappingResult[2].tableHR.fields.name],
+                        email: result[0][mappingResult[2].tableHR.fields.email],
+                        description: result[0].description,
+                        members: []
+                    }
+                ];
+
+                var index = 0
+                //bo team
+                while (index < result.length) {
+                    var teamLength = 0;
+                    for (let i = 0; i < result.length; i++) {
+                        if (teamResult[teamLength].id === result[i].members_team_id) {
+                            var addMember = {
+                                employee_id: result[i].members_employee_id,
+                                employee: {
+                                    employee_id: result[i].members_employee_employee_id,
+                                    primary_email: result[i].members_employee_primary_email
+                                }
+                            }
+                            teamResult[teamLength].members.push(addMember)
+                            index = index + 1;
+                        } else if (teamResult[teamLength].id !== result[i].members_team_id) {
+                            var addTeam =
+                            {
+                                id: result[i][mappingResult[2].tableHR.fields.id],
+                                name: result[i][mappingResult[2].tableHR.fields.name],
+                                email: result[i][mappingResult[2].tableHR.fields.email],
+                                description: result[i].description,
+                                members: [
+                                    {
+                                        employee_id: result[i].members_employee_id,
+                                        employee: {
+                                            employee_id: result[i].members_employee_employee_id,
+                                            primary_email: result[i].members_employee_primary_email
+                                        }
+                                    }
+                                ]
+                            }
+                                ;
+                            teamResult.push(addTeam)
+                            teamLength = teamLength + 1;
+                            index = index + 1;
+                        }
+                    }
+                }
+                data.teams = teamResult
+                console.log(data);
+                connectionString.destroy(function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                })
+            })
         }
     } catch (error) {
         console.log(error);
