@@ -11,6 +11,7 @@ const department_dao = require('../company-daos/department.dao');
 const team_dao = require('../company-daos/team.dao');
 const position = require('../company-daos/position.dao');
 const mssql = require('mssql');
+const crypto = require('crypto-js');
 
 router.post("/", async (req, res) => {
     const dbInfo = req.body;
@@ -410,24 +411,21 @@ router.post("/", async (req, res) => {
 
 
 router.put("/", async (req, res) => {
+    const mappingReq = req.body.mapping;
+    const accountId = req.body.accountId;
+    const dbHR = req.body.dbInfor;
     const dbInfo = {
-        dbName: 'hrms',
+        dbName: 'gmhrs',
         host: '103.143.209.237',
         port: '3306',
-        username: 'hrms',
+        username: 'root',
         password: 'Zz@123456',
         dialect: 'mysql'
     }
-
-    console.log(req.body);
-    const mappingReq = req.body
-    var data = {
-        employees: [],
-        teams: [],
-        departments: [],
-        positions: []
-    }
+    console.log(accountId);
+    console.log(dbHR);
     try {
+        var dbConnect = "'" + dbHR.dbName + " " + dbHR.host + " " + dbHR.port + " " + dbHR.username + " " + dbHR.password + " " + dbHR.dialect + "'";
         var mappingResult = [
             {
                 tableGM: "gmhrs_employee_view",
@@ -515,7 +513,6 @@ router.put("/", async (req, res) => {
                 }
             }
         ]
-        console.log(mappingResult[0].tableHR.fields);
         var check = await testConnectionDao.checkConnection(dbInfo);
         console.log(check);
         if (check === true) {
@@ -538,6 +535,8 @@ router.put("/", async (req, res) => {
                 if (err) throw err;
                 console.log('error when connecting to db:', err);
             });
+
+            //employee query
             var empQuery = " SELECT employee." + mappingResult[0].tableHR.fields.id + " , employee." + mappingResult[0].tableHR.fields.primary_email + ", employee." + mappingResult[0].tableHR.fields.personal_email + ", employee." + mappingResult[0].tableHR.fields.first_name + ", employee." + mappingResult[0].tableHR.fields.last_name + ", " +
                 "employee.modified_date, employee." + mappingResult[0].tableHR.fields.address + ", employee." + mappingResult[0].tableHR.fields.position_id + ", employee." + mappingResult[0].tableHR.fields.department_id + ", employee." + mappingResult[0].tableHR.fields.phone + ", employee.status_id, " +
                 " department." + mappingResult[1].tableHR.fields.id + " AS departmentId, department." + mappingResult[1].tableHR.fields.name + " AS department_name, " +
@@ -549,224 +548,39 @@ router.put("/", async (req, res) => {
                 "LEFT OUTER JOIN " + mappingResult[3].tableHR.nametableHR + " AS teams ON employee." + mappingResult[0].tableHR.fields.id + " = teams.employee_id " +
                 "WHERE employee.status_id = 1 ORDER BY employee.primary_email ASC "
 
-            console.log(empQuery);
-            var employeeResponse;
-            var employeeResult
-            await connectionString.query(empQuery, (err, result, fields) => {
-                if (err) {
-                    console.log(err);
-                }
-                employeeResponse = result;
-                employeeResult = [
-                    {
-                        id: employeeResponse[0][mappingResult[0].tableHR.fields.id],
-                        primary_email: employeeResponse[0][mappingResult[0].tableHR.fields.primary_email],
-                        personal_email: employeeResponse[0][mappingResult[0].tableHR.fields.personal_email],
-                        first_name: employeeResponse[0][mappingResult[0].tableHR.fields.first_name],
-                        last_name: employeeResponse[0][mappingResult[0].tableHR.fields.last_name],
-                        modified_date: employeeResponse[0].modified_date,
-                        address: employeeResponse[0][mappingResult[0].tableHR.fields.address],
-                        position_id: employeeResponse[0][mappingResult[0].tableHR.fields.position_id],
-                        department_id: employeeResponse[0][mappingResult[0].tableHR.fields.department_id],
-                        phone: employeeResponse[0][mappingResult[0].tableHR.fields.phone],
-                        status_id: employeeResponse[0].status_id,
-                        vacation_start_date: null,
-                        vacation_end_date: null,
-                        department: {
-                            id: employeeResponse[0].departmentId,
-                            name: employeeResponse[0].department_name,
-                            email: employeeResponse[0].department_email
-                        },
-                        position: {
-                            id: employeeResponse[0].position_id,
-                            name: employeeResponse[0].position_name
-                        },
-                        // teams: [
-
-                        // ]
-                    }
-                ]
-                var index = 0
-                //bo team
-                while (index < employeeResponse.length) {
-                    var teamLength = 0;
-                    for (let i = 0; i < employeeResponse.length; i++) {
-                        if (employeeResult[teamLength].id === employeeResponse[i][mappingResult[0].tableHR.fields.id]) {
-                            // var teamid = { team_id: employeeResponse[i].teams_team_id };
-                            // employeeResult[teamLength].teams.push(teamid);
-                            index = index + 1;
-                        } else if (employeeResult[teamLength].id !== employeeResponse[i].id) {
-                            var newEmp = {
-                                id: employeeResponse[i][mappingResult[0].tableHR.fields.id],
-                                primary_email: employeeResponse[i][mappingResult[0].tableHR.fields.primary_email],
-                                personal_email: employeeResponse[i][mappingResult[0].tableHR.fields.personal_email],
-                                first_name: employeeResponse[i][mappingResult[0].tableHR.fields.first_name],
-                                last_name: employeeResponse[i][mappingResult[0].tableHR.fields.last_name],
-                                modified_date: employeeResponse[i].modified_date,
-                                address: employeeResponse[i][mappingResult[0].tableHR.fields.address],
-                                position_id: employeeResponse[i][mappingResult[0].tableHR.fields.position_id],
-                                department_id: employeeResponse[i][mappingResult[0].tableHR.fields.department_id],
-                                phone: employeeResponse[i][mappingResult[0].tableHR.fields.phone],
-                                status_id: employeeResponse[i].status_id,
-                                vacation_start_date: null,
-                                vacation_end_date: null,
-                                department: {
-                                    id: employeeResponse[i].departmentId,
-                                    name: employeeResponse[i].department_name,
-                                    email: employeeResponse[i].department_email
-                                },
-                                position: {
-                                    id: employeeResponse[i].position_id,
-                                    name: employeeResponse[i].position_name
-                                },
-                                // teams: [
-                                //     { team_id: employeeResponse[i].teams_team_id }
-                                // ]
-                            }
-                            employeeResult.push(newEmp);
-                            teamLength = teamLength + 1;
-                            index = index + 1;
-                        }
-                    }
-                }
-
-
-
-                // console.log(today.toISOString().substring(0, 10));
-
-                // connectionString.destroy(function (err) {
-                //     if (err) {
-                //         console.log(err);
-                //     }
-                // })
-
-
-            })
-
-
+            //vacation query
             const vacationQuery = "SELECT " + mappingResult[5].tableHR.fields.employee_id + ", " + mappingResult[5].tableHR.fields.start_date + ", " + mappingResult[5].tableHR.fields.end_date +
                 " FROM " + mappingResult[5].tableHR.nametableHR + " AS vacation_date WHERE (current_date() between date(vacation_date." + mappingResult[5].tableHR.fields.start_date +
                 ") and date(vacation_date." + mappingResult[5].tableHR.fields.end_date + ")) OR date(vacation_date." + mappingResult[5].tableHR.fields.start_date + ") >= current_date() ORDER BY vacation_date." + mappingResult[5].tableHR.fields.start_date + " DESC";
-            console.log(sql);
-            await connectionString.query(vacationQuery, (err, result, fields) => {
-                if (err) {
-                    console.log(err);
-                }
-                console.log(result);
-                if (result.length > 0) {
-                    for (let i = 0; i < employeeResult.length; i++) {
-                        for (let j = 0; j < result.length; j++) {
-                            if (employeeResult[i]["id"] === result[j][mappingResult[5].tableHR.fields.employee_id]) {
-                                employeeResult[i]["vacation_start_date"] = result[j][mappingResult[5].tableHR.fields.start_date];
-                                employeeResult[i]["vacation_end_date"] = result[j][mappingResult[5].tableHR.fields.end_date];
-                            }
-                        }
-                    }
-                }
-                data.employees = employeeResult
-            })
 
-            //department
+
+            //department query
             const departmentQuery = "SELECT " + mappingResult[1].tableHR.fields.id + ", " + mappingResult[1].tableHR.fields.name +
                 ", " + mappingResult[1].tableHR.fields.email + " FROM " + mappingResult[1].tableHR.nametableHR +
                 " AS department WHERE department.status_id = 1 ORDER BY department." + mappingResult[1].tableHR.fields.name + " ASC";
-            await connectionString.query(departmentQuery, (err, result, fields) => {
-                if (err) {
-                    console.log(err);
-                }
-                var department = [];
-                for (let i = 0; i < result.length; i++) {
-                    var dep = {
-                        id: result[i][mappingResult[1].tableHR.fields.id],
-                        name: result[i][mappingResult[1].tableHR.fields.name],
-                        email: result[i][mappingResult[1].tableHR.fields.email]
-                    }
-                    department.push(dep)
-                }
-                data.departments = department
-            })
 
-            //position
+
+            //position query
             const positionQuery = "SELECT " + mappingResult[4].tableHR.fields.id + ", " + mappingResult[4].tableHR.fields.name +
                 " FROM " + mappingResult[4].tableHR.nametableHR + " AS position ORDER BY position." + mappingResult[4].tableHR.fields.name + " ASC";
-            await connectionString.query(positionQuery, (err, result, fields) => {
-                if (err) {
-                    console.log(err);
-                }
-                var position = [];
-                for (let i = 0; i < result.length; i++) {
-                    var pos = {
-                        id: result[i][mappingResult[4].tableHR.fields.id],
-                        name: result[i][mappingResult[4].tableHR.fields.name],
-                    }
-                    position.push(pos)
-                }
-                data.positions = position
-                // console.log(data);
-            })
 
-            //team
+
+            //team query
             const teamQuery = "SELECT team." + mappingResult[2].tableHR.fields.id + ", team." + mappingResult[2].tableHR.fields.name + ", team." + mappingResult[2].tableHR.fields.email + ", team.created_date, team.status_id, team.modified_date, team.description, " +
                 "members." + mappingResult[3].tableHR.fields.team_id + " AS members_team_id, members." + mappingResult[3].tableHR.fields.employee_id + " AS members_employee_id, members.modified_date AS members_modified_date, " +
                 "`members->" + mappingResult[0].tableHR.nametableHR + "`." + mappingResult[0].tableHR.fields.id + " AS members_employee_id, `members->" + mappingResult[0].tableHR.nametableHR + "`." + mappingResult[0].tableHR.fields.primary_email + " AS members_employee_primary_email, `members->" + mappingResult[0].tableHR.nametableHR + "`." + mappingResult[0].tableHR.fields.id + " " +
                 "AS members_employee_employee_id FROM " + mappingResult[2].tableHR.nametableHR + " AS team LEFT OUTER JOIN " + mappingResult[3].tableHR.nametableHR + " AS members ON team." + mappingResult[2].tableHR.fields.id + " = members.team_id " +
                 "LEFT OUTER JOIN " + mappingResult[0].tableHR.nametableHR + " AS `members->" + mappingResult[0].tableHR.nametableHR + "` ON members." + mappingResult[3].tableHR.fields.employee_id + " = `members->" + mappingResult[0].tableHR.nametableHR + "`." + mappingResult[0].tableHR.fields.id + " WHERE team.status_id = 1 ORDER BY team." + mappingResult[2].tableHR.fields.email + " ASC"
-            console.log(teamQuery);
-            await connectionString.query(teamQuery, (err, result, fields) => {
+
+
+            const connection_mapping_query = '"employeeQuery:' + empQuery + 'vacationQuery:' + vacationQuery + 'departmentQuery:' + departmentQuery + 'positionQuery:' + positionQuery + 'teamQuery:' + teamQuery + '"'
+            // var crypQuery = "'" + crypto.AES.encrypt(connection_mapping_query, "Zz@123456") + "'";
+            const querySaveData = "update account set connection_database = " + dbConnect + ", connection_mapping_query = " + connection_mapping_query + " where id = " + accountId;
+            await connectionString.query(querySaveData, (err, result, fields) => {
                 if (err) {
                     console.log(err);
                 }
-                var teamResult = [
-                    {
-                        id: result[0][mappingResult[2].tableHR.fields.id],
-                        name: result[0][mappingResult[2].tableHR.fields.name],
-                        email: result[0][mappingResult[2].tableHR.fields.email],
-                        description: result[0].description,
-                        members: []
-                    }
-                ];
-
-                var index = 0
-                //bo team
-                while (index < result.length) {
-                    var teamLength = 0;
-                    for (let i = 0; i < result.length; i++) {
-                        if (teamResult[teamLength].id === result[i].members_team_id) {
-                            var addMember = {
-                                employee_id: result[i].members_employee_id,
-                                employee: {
-                                    employee_id: result[i].members_employee_employee_id,
-                                    primary_email: result[i].members_employee_primary_email
-                                }
-                            }
-                            teamResult[teamLength].members.push(addMember)
-                            index = index + 1;
-                        } else if (teamResult[teamLength].id !== result[i].members_team_id) {
-                            var addTeam =
-                            {
-                                id: result[i][mappingResult[2].tableHR.fields.id],
-                                name: result[i][mappingResult[2].tableHR.fields.name],
-                                email: result[i][mappingResult[2].tableHR.fields.email],
-                                description: result[i].description,
-                                members: [
-                                    {
-                                        employee_id: result[i].members_employee_id,
-                                        employee: {
-                                            employee_id: result[i].members_employee_employee_id,
-                                            primary_email: result[i].members_employee_primary_email
-                                        }
-                                    }
-                                ]
-                            }
-                                ;
-                            teamResult.push(addTeam)
-                            teamLength = teamLength + 1;
-                            index = index + 1;
-                        }
-                    }
-                }
-                data.teams = teamResult
-                console.log(data);
+                console.log(result);
                 connectionString.destroy(function (err) {
                     if (err) {
                         console.log(err);
@@ -778,8 +592,270 @@ router.put("/", async (req, res) => {
         console.log(error);
         res.send("Server unavailable!")
     }
+});
+
+router.get("/", async (req, res) => {
+    // const accountId = req.query.accountId;
+    // const connection_database = null;
+    // const connection_mapping_query = null;
+
+    try {
+        const dbInfo = {
+            dbName: 'gmhrs',
+            host: '103.143.209.237',
+            port: '3306',
+            username: 'root',
+            password: 'Zz@123456',
+            dialect: 'mysql'
+        }
+        var check = await testConnectionDao.checkConnection(dbInfo);
+        console.log(check);
+        var data = {
+            employees: [],
+            teams: [],
+            departments: [],
+            positions: []
+        }
+        if (check === true) {
+            const connectionString = sql_connection.createConnection({
+                host: dbInfo.host,
+                user: dbInfo.username,
+                password: dbInfo.password,
+                database: dbInfo.dbName,
+                port: dbInfo.port,
+                timestamps: false,
+                pool: {
+                    max: 5,
+                    min: 0,
+                    acquire: 30000,
+                    idle: 10000
+                }
+            })
+            // connect db
+            await connectionString.connect(function (err) {
+                if (err)
+                    console.log('error when connecting to db:', err);
+
+            });
+            const queryDBGMHRS = "select connection_database,connection_mapping_query from account where id = 1";
+            await connectionString.query(queryDBGMHRS, (err, result, fields) => {
+                if (err) {
+                    console.log(err);
+                }
+                connection_database = result[0].connection_database;
+                connection_mapping_query = result[0].connection_mapping_query
+
+                // var query = crypto.AES.decrypt(connection_mapping_query, "Zz@123456");
+                // console.log(query);
+                connectionString.destroy(function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    var a = result
+                })
+                return;
+            })
+        }
 
 
+        //employee data
+        var employeeResponse;
+        var employeeResult
+        // await connectionString.query(empQuery, (err, result, fields) => {
+        //     if (err) {
+        //         console.log(err);
+        //     }
+        //     employeeResponse = result;
+        //     employeeResult = [
+        //         {
+        //             id: employeeResponse[0][mappingResult[0].tableHR.fields.id],
+        //             primary_email: employeeResponse[0][mappingResult[0].tableHR.fields.primary_email],
+        //             personal_email: employeeResponse[0][mappingResult[0].tableHR.fields.personal_email],
+        //             first_name: employeeResponse[0][mappingResult[0].tableHR.fields.first_name],
+        //             last_name: employeeResponse[0][mappingResult[0].tableHR.fields.last_name],
+        //             modified_date: employeeResponse[0].modified_date,
+        //             address: employeeResponse[0][mappingResult[0].tableHR.fields.address],
+        //             position_id: employeeResponse[0][mappingResult[0].tableHR.fields.position_id],
+        //             department_id: employeeResponse[0][mappingResult[0].tableHR.fields.department_id],
+        //             phone: employeeResponse[0][mappingResult[0].tableHR.fields.phone],
+        //             status_id: employeeResponse[0].status_id,
+        //             vacation_start_date: null,
+        //             vacation_end_date: null,
+        //             department: {
+        //                 id: employeeResponse[0].departmentId,
+        //                 name: employeeResponse[0].department_name,
+        //                 email: employeeResponse[0].department_email
+        //             },
+        //             position: {
+        //                 id: employeeResponse[0].position_id,
+        //                 name: employeeResponse[0].position_name
+        //             },
+        //             // teams: [
 
-})
+        //             // ]
+        //         }
+        //     ]
+        //     var index = 0
+        //     //bo team
+        //     while (index < employeeResponse.length) {
+        //         var teamLength = 0;
+        //         for (let i = 0; i < employeeResponse.length; i++) {
+        //             if (employeeResult[teamLength].id === employeeResponse[i][mappingResult[0].tableHR.fields.id]) {
+        //                 // var teamid = { team_id: employeeResponse[i].teams_team_id };
+        //                 // employeeResult[teamLength].teams.push(teamid);
+        //                 index = index + 1;
+        //             } else if (employeeResult[teamLength].id !== employeeResponse[i].id) {
+        //                 var newEmp = {
+        //                     id: employeeResponse[i][mappingResult[0].tableHR.fields.id],
+        //                     primary_email: employeeResponse[i][mappingResult[0].tableHR.fields.primary_email],
+        //                     personal_email: employeeResponse[i][mappingResult[0].tableHR.fields.personal_email],
+        //                     first_name: employeeResponse[i][mappingResult[0].tableHR.fields.first_name],
+        //                     last_name: employeeResponse[i][mappingResult[0].tableHR.fields.last_name],
+        //                     modified_date: employeeResponse[i].modified_date,
+        //                     address: employeeResponse[i][mappingResult[0].tableHR.fields.address],
+        //                     position_id: employeeResponse[i][mappingResult[0].tableHR.fields.position_id],
+        //                     department_id: employeeResponse[i][mappingResult[0].tableHR.fields.department_id],
+        //                     phone: employeeResponse[i][mappingResult[0].tableHR.fields.phone],
+        //                     status_id: employeeResponse[i].status_id,
+        //                     vacation_start_date: null,
+        //                     vacation_end_date: null,
+        //                     department: {
+        //                         id: employeeResponse[i].departmentId,
+        //                         name: employeeResponse[i].department_name,
+        //                         email: employeeResponse[i].department_email
+        //                     },
+        //                     position: {
+        //                         id: employeeResponse[i].position_id,
+        //                         name: employeeResponse[i].position_name
+        //                     },
+        //                     // teams: [
+        //                     //     { team_id: employeeResponse[i].teams_team_id }
+        //                     // ]
+        //                 }
+        //                 employeeResult.push(newEmp);
+        //                 teamLength = teamLength + 1;
+        //                 index = index + 1;
+        //             }
+        //         }
+        //     }
+        // })
+
+        // //vacation data
+        // await connectionString.query(vacationQuery, (err, result, fields) => {
+        //     if (err) {
+        //         console.log(err);
+        //     }
+        //     if (result.length > 0) {
+        //         for (let i = 0; i < employeeResult.length; i++) {
+        //             for (let j = 0; j < result.length; j++) {
+        //                 if (employeeResult[i]["id"] === result[j][mappingResult[5].tableHR.fields.employee_id]) {
+        //                     employeeResult[i]["vacation_start_date"] = result[j][mappingResult[5].tableHR.fields.start_date];
+        //                     employeeResult[i]["vacation_end_date"] = result[j][mappingResult[5].tableHR.fields.end_date];
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     data.employees = employeeResult
+        // })
+
+        // //department daata
+        // await connectionString.query(departmentQuery, (err, result, fields) => {
+        //     if (err) {
+        //         console.log(err);
+        //     }
+        //     var department = [];
+        //     for (let i = 0; i < result.length; i++) {
+        //         var dep = {
+        //             id: result[i][mappingResult[1].tableHR.fields.id],
+        //             name: result[i][mappingResult[1].tableHR.fields.name],
+        //             email: result[i][mappingResult[1].tableHR.fields.email]
+        //         }
+        //         department.push(dep)
+        //     }
+        //     data.departments = department
+        // })
+
+        // //team data
+        // await connectionString.query(teamQuery, (err, result, fields) => {
+        //     if (err) {
+        //         console.log(err);
+        //     }
+        //     var teamResult = [
+        //         {
+        //             id: result[0][mappingResult[2].tableHR.fields.id],
+        //             name: result[0][mappingResult[2].tableHR.fields.name],
+        //             email: result[0][mappingResult[2].tableHR.fields.email],
+        //             description: result[0].description,
+        //             members: []
+        //         }
+        //     ];
+
+        //     var index = 0
+        //     //bo team
+        //     while (index < result.length) {
+        //         var teamLength = 0;
+        //         for (let i = 0; i < result.length; i++) {
+        //             if (teamResult[teamLength].id === result[i].members_team_id) {
+        //                 var addMember = {
+        //                     employee_id: result[i].members_employee_id,
+        //                     employee: {
+        //                         employee_id: result[i].members_employee_employee_id,
+        //                         primary_email: result[i].members_employee_primary_email
+        //                     }
+        //                 }
+        //                 teamResult[teamLength].members.push(addMember)
+        //                 index = index + 1;
+        //             } else if (teamResult[teamLength].id !== result[i].members_team_id) {
+        //                 var addTeam =
+        //                 {
+        //                     id: result[i][mappingResult[2].tableHR.fields.id],
+        //                     name: result[i][mappingResult[2].tableHR.fields.name],
+        //                     email: result[i][mappingResult[2].tableHR.fields.email],
+        //                     description: result[i].description,
+        //                     members: [
+        //                         {
+        //                             employee_id: result[i].members_employee_id,
+        //                             employee: {
+        //                                 employee_id: result[i].members_employee_employee_id,
+        //                                 primary_email: result[i].members_employee_primary_email
+        //                             }
+        //                         }
+        //                     ]
+        //                 }
+        //                     ;
+        //                 teamResult.push(addTeam)
+        //                 teamLength = teamLength + 1;
+        //                 index = index + 1;
+        //             }
+        //         }
+        //     }
+        //     data.teams = teamResult
+        //     connectionString.destroy(function (err) {
+        //         if (err) {
+        //             console.log(err);
+        //         }
+        //     })
+        // })
+
+        // //position data
+        // await connectionString.query(positionQuery, (err, result, fields) => {
+        // if (err) {
+        //     console.log(err);
+        // }
+        // var position = [];
+        // for (let i = 0; i < result.length; i++) {
+        //     var pos = {
+        //         id: result[i][mappingResult[4].tableHR.fields.id],
+        //         name: result[i][mappingResult[4].tableHR.fields.name],
+        //     }
+        //     position.push(pos)
+        // }
+        // data.positions = position
+        // console.log(data);
+        // })
+    } catch (err) {
+        console.log(err.message);
+        res.send("Server error");
+    }
+});
 module.exports = router;
