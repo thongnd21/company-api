@@ -18,7 +18,17 @@ router.post("/", async (req, res) => {
     try {
 
         var structure = {
-            table: null,
+            employees: {},
+            teams: {},
+            departments: {},
+            positions: {},
+            team_employee: {},
+            vacation_date: {},
+            character_maximum_length_employee: {},
+            character_maximum_length_department: {},
+            character_maximum_length_team: {},
+            character_maximum_length_position: {},
+            table: [],
             checkConnection: {
                 status: '',
                 message: ''
@@ -73,111 +83,113 @@ router.post("/", async (req, res) => {
                     if (err) {
                         console.log(err);
                     }
-                    // for (var i = 0; i < result.length; i++) {
-                    //     if (result[i].TABLE_NAME == "gmhrs_employee_view") {
-                    //         if (result[i].COLUMN_NAME == "primary_email" && result[i].CHARACTER_MAXIMUM_LENGTH <= 254) {
-                    //             structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         } else if (result[i].COLUMN_NAME == "primary_email" && result[i].CHARACTER_MAXIMUM_LENGTH > 254) {
-                    //             structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
 
-                    //         if (result[i].COLUMN_NAME == "personal_email" && result[i].CHARACTER_MAXIMUM_LENGTH <= 254) {
-                    //             structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         } else if (result[i].COLUMN_NAME == "personal_email" && result[i].CHARACTER_MAXIMUM_LENGTH > 254) {
-                    //             structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
+                    //check valid database
+                    for (var i = 0; i < result.length; i++) {
+                        if (result[i].TABLE_NAME == "gmhrs_employee_view") {
+                            if (result[i].COLUMN_NAME == "primary_email" && result[i].CHARACTER_MAXIMUM_LENGTH <= 254) {
+                                structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            } else if (result[i].COLUMN_NAME == "primary_email" && result[i].CHARACTER_MAXIMUM_LENGTH > 254) {
+                                structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
 
-                    //         if (result[i].COLUMN_NAME == "phone" && result[i].CHARACTER_MAXIMUM_LENGTH <= 15) {
-                    //             structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         } else if (result[i].COLUMN_NAME == "phone" && result[i].CHARACTER_MAXIMUM_LENGTH > 15) {
-                    //             structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
+                            if (result[i].COLUMN_NAME == "personal_email" && result[i].CHARACTER_MAXIMUM_LENGTH <= 254) {
+                                structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            } else if (result[i].COLUMN_NAME == "personal_email" && result[i].CHARACTER_MAXIMUM_LENGTH > 254) {
+                                structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
 
-                    //         if (result[i].COLUMN_NAME == "first_name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 45) {
-                    //             structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         } else if (result[i].COLUMN_NAME == "first_name" && result[i].CHARACTER_MAXIMUM_LENGTH > 45) {
-                    //             structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
+                            if (result[i].COLUMN_NAME == "phone" && result[i].CHARACTER_MAXIMUM_LENGTH <= 15) {
+                                structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            } else if (result[i].COLUMN_NAME == "phone" && result[i].CHARACTER_MAXIMUM_LENGTH > 15) {
+                                structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
 
-                    //         if (result[i].COLUMN_NAME == "last_name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 45) {
-                    //             structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         } else if (result[i].COLUMN_NAME == "last_name" && result[i].CHARACTER_MAXIMUM_LENGTH > 45) {
-                    //             structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
+                            if (result[i].COLUMN_NAME == "first_name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 45) {
+                                structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            } else if (result[i].COLUMN_NAME == "first_name" && result[i].CHARACTER_MAXIMUM_LENGTH > 45) {
+                                structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
 
-                    //         if (result[i].COLUMN_NAME == "address" && result[i].CHARACTER_MAXIMUM_LENGTH <= 512) {
-                    //             structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         } else if (result[i].COLUMN_NAME == "address" && result[i].CHARACTER_MAXIMUM_LENGTH > 512) {
-                    //             structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
+                            if (result[i].COLUMN_NAME == "last_name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 45) {
+                                structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            } else if (result[i].COLUMN_NAME == "last_name" && result[i].CHARACTER_MAXIMUM_LENGTH > 45) {
+                                structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
 
-                    //         if (result[i].COLUMN_NAME == "position_id") {
-                    //             structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
+                            if (result[i].COLUMN_NAME == "address" && result[i].CHARACTER_MAXIMUM_LENGTH <= 512) {
+                                structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            } else if (result[i].COLUMN_NAME == "address" && result[i].CHARACTER_MAXIMUM_LENGTH > 512) {
+                                structure.character_maximum_length_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
 
-                    //         if (result[i].COLUMN_NAME == "department_id") {
-                    //             structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
+                            if (result[i].COLUMN_NAME == "position_id") {
+                                structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
 
-                    //         if (result[i].COLUMN_NAME == "id") {
-                    //             structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
-                    //     }
-                    //     if (result[i].TABLE_NAME == "gmhrs_department_view") {
-                    //         if (result[i].COLUMN_NAME == "id") {
-                    //             structure.departments[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
+                            if (result[i].COLUMN_NAME == "department_id") {
+                                structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
 
-                    //         if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 200) {
-                    //             structure.departments[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         } else if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH > 200) {
-                    //             structure.character_maximum_length_department[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
+                            if (result[i].COLUMN_NAME == "id") {
+                                structure.employees[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
+                        }
+                        if (result[i].TABLE_NAME == "gmhrs_department_view") {
+                            if (result[i].COLUMN_NAME == "id") {
+                                structure.departments[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
 
-                    //         if (result[i].COLUMN_NAME == "email" && result[i].CHARACTER_MAXIMUM_LENGTH <= 254) {
-                    //             structure.departments[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         } else if (result[i].COLUMN_NAME == "email" && result[i].CHARACTER_MAXIMUM_LENGTH > 254) {
-                    //             structure.character_maximum_length_department[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
-                    //     }
-                    //     if (result[i].TABLE_NAME == "gmhrs_team_view") {
-                    //         if (result[i].COLUMN_NAME == "id") {
-                    //             structure.teams[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
+                            if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 200) {
+                                structure.departments[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            } else if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH > 200) {
+                                structure.character_maximum_length_department[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
 
-                    //         if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 200) {
-                    //             structure.teams[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         } else if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH > 200) {
-                    //             structure.character_maximum_length_team[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
+                            if (result[i].COLUMN_NAME == "email" && result[i].CHARACTER_MAXIMUM_LENGTH <= 254) {
+                                structure.departments[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            } else if (result[i].COLUMN_NAME == "email" && result[i].CHARACTER_MAXIMUM_LENGTH > 254) {
+                                structure.character_maximum_length_department[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
+                        }
+                        if (result[i].TABLE_NAME == "gmhrs_team_view") {
+                            if (result[i].COLUMN_NAME == "id") {
+                                structure.teams[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
 
-                    //         if (result[i].COLUMN_NAME == "email" && result[i].CHARACTER_MAXIMUM_LENGTH <= 254) {
-                    //             structure.teams[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         } else if (result[i].COLUMN_NAME == "email" && result[i].CHARACTER_MAXIMUM_LENGTH > 254) {
-                    //             structure.character_maximum_length_team[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
-                    //     }
-                    //     if (result[i].TABLE_NAME == "gmhrs_team_employee_view") {
-                    //         structure.team_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //     }
-                    //     if (result[i].TABLE_NAME == "gmhrs_position_view") {
-                    //         if (result[i].COLUMN_NAME == "id") {
-                    //             structure.positions[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
+                            if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 200) {
+                                structure.teams[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            } else if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH > 200) {
+                                structure.character_maximum_length_team[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
 
-                    //         if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 200) {
-                    //             structure.positions[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         } else if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH > 200) {
-                    //             structure.character_maximum_length_position[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //         }
-                    //     }
-                    //     if (result[i].TABLE_NAME == "gmhrs_vacation_date_view") {
-                    //         structure.vacation_date[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
-                    //     }
-                    // }
+                            if (result[i].COLUMN_NAME == "email" && result[i].CHARACTER_MAXIMUM_LENGTH <= 254) {
+                                structure.teams[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            } else if (result[i].COLUMN_NAME == "email" && result[i].CHARACTER_MAXIMUM_LENGTH > 254) {
+                                structure.character_maximum_length_team[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
+                        }
+                        if (result[i].TABLE_NAME == "gmhrs_team_employee_view") {
+                            structure.team_employee[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+                        if (result[i].TABLE_NAME == "gmhrs_position_view") {
+                            if (result[i].COLUMN_NAME == "id") {
+                                structure.positions[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
+
+                            if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH <= 200) {
+                                structure.positions[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            } else if (result[i].COLUMN_NAME == "name" && result[i].CHARACTER_MAXIMUM_LENGTH > 200) {
+                                structure.character_maximum_length_position[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                            }
+                        }
+                        if (result[i].TABLE_NAME == "gmhrs_vacation_date_view") {
+                            structure.vacation_date[result[i].COLUMN_NAME] = (result[i].COLUMN_NAME)
+                        }
+                    }
 
 
-
+                    // list mapping
                     var listTable = [];
                     var listTableName = [];
                     let tableNameMap = new Map();
@@ -256,108 +268,108 @@ router.post("/", async (req, res) => {
 
                         // send records as a response
                         console.log(recordset);
-                        // for (var i = 0; i < recordset.length; i++) {
-                        //     if (recordset[i].table_name == "gmhrs_employee_view") {
-                        //         if (recordset[i].column_name == "primary_email" && recordset[i].character_maximum_length <= 254) {
-                        //             structure.employees[result[i].COLUMN_NAME] = (recordset[i].column_name)
-                        //         } else if (recordset[i].column_name == "primary_email" && recordset[i].character_maximum_length > 254) {
-                        //             structure.character_maximum_length_employee[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
+                        for (var i = 0; i < recordset.length; i++) {
+                            if (recordset[i].table_name == "gmhrs_employee_view") {
+                                if (recordset[i].column_name == "primary_email" && recordset[i].character_maximum_length <= 254) {
+                                    structure.employees[result[i].COLUMN_NAME] = (recordset[i].column_name)
+                                } else if (recordset[i].column_name == "primary_email" && recordset[i].character_maximum_length > 254) {
+                                    structure.character_maximum_length_employee[recordset[i].column_name] = (recordset[i].column_name)
+                                }
 
-                        //         if (recordset[i].column_name == "personal_email" && recordset[i].character_maximum_length <= 254) {
-                        //             structure.employees[recordset[i].column_name] = (recordset[i].column_name)
-                        //         } else if (recordset[i].column_name == "personal_email" && recordset[i].character_maximum_length > 254) {
-                        //             structure.character_maximum_length_employee[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
+                                if (recordset[i].column_name == "personal_email" && recordset[i].character_maximum_length <= 254) {
+                                    structure.employees[recordset[i].column_name] = (recordset[i].column_name)
+                                } else if (recordset[i].column_name == "personal_email" && recordset[i].character_maximum_length > 254) {
+                                    structure.character_maximum_length_employee[recordset[i].column_name] = (recordset[i].column_name)
+                                }
 
-                        //         if (recordset[i].column_name == "phone" && recordset[i].character_maximum_length <= 15) {
-                        //             structure.employees[result[i].COLUMN_NAME] = (recordset[i].column_name)
-                        //         } else if (recordset[i].column_name == "phone" && recordset[i].character_maximum_length > 15) {
-                        //             structure.character_maximum_length_employee[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
+                                if (recordset[i].column_name == "phone" && recordset[i].character_maximum_length <= 15) {
+                                    structure.employees[result[i].COLUMN_NAME] = (recordset[i].column_name)
+                                } else if (recordset[i].column_name == "phone" && recordset[i].character_maximum_length > 15) {
+                                    structure.character_maximum_length_employee[recordset[i].column_name] = (recordset[i].column_name)
+                                }
 
-                        //         if (recordset[i].column_name == "first_name" && recordset[i].character_maximum_length <= 45) {
-                        //             structure.employees[recordset[i].column_name] = (recordset[i].column_name)
-                        //         } else if (recordset[i].column_name == "first_name" && recordset[i].character_maximum_length > 45) {
-                        //             structure.character_maximum_length_employee[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
+                                if (recordset[i].column_name == "first_name" && recordset[i].character_maximum_length <= 45) {
+                                    structure.employees[recordset[i].column_name] = (recordset[i].column_name)
+                                } else if (recordset[i].column_name == "first_name" && recordset[i].character_maximum_length > 45) {
+                                    structure.character_maximum_length_employee[recordset[i].column_name] = (recordset[i].column_name)
+                                }
 
-                        //         if (recordset[i].column_name == "last_name" && recordset[i].character_maximum_length <= 45) {
-                        //             structure.employees[recordset[i].column_name] = (recordset[i].column_name)
-                        //         } else if (recordset[i].column_name == "last_name" && recordset[i].character_maximum_length > 45) {
-                        //             structure.character_maximum_length_employee[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
+                                if (recordset[i].column_name == "last_name" && recordset[i].character_maximum_length <= 45) {
+                                    structure.employees[recordset[i].column_name] = (recordset[i].column_name)
+                                } else if (recordset[i].column_name == "last_name" && recordset[i].character_maximum_length > 45) {
+                                    structure.character_maximum_length_employee[recordset[i].column_name] = (recordset[i].column_name)
+                                }
 
-                        //         if (recordset[i].column_name == "address" && recordset[i].character_maximum_length <= 512) {
-                        //             structure.employees[recordset[i].column_name] = (recordset[i].column_name)
-                        //         } else if (recordset[i].column_name == "address" && recordset[i].character_maximum_length > 512) {
-                        //             structure.character_maximum_length_employee[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
+                                if (recordset[i].column_name == "address" && recordset[i].character_maximum_length <= 512) {
+                                    structure.employees[recordset[i].column_name] = (recordset[i].column_name)
+                                } else if (recordset[i].column_name == "address" && recordset[i].character_maximum_length > 512) {
+                                    structure.character_maximum_length_employee[recordset[i].column_name] = (recordset[i].column_name)
+                                }
 
-                        //         if (recordset[i].column_name == "position_id") {
-                        //             structure.employees[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
+                                if (recordset[i].column_name == "position_id") {
+                                    structure.employees[recordset[i].column_name] = (recordset[i].column_name)
+                                }
 
-                        //         if (recordset[i].column_name == "department_id") {
-                        //             structure.employees[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
+                                if (recordset[i].column_name == "department_id") {
+                                    structure.employees[recordset[i].column_name] = (recordset[i].column_name)
+                                }
 
-                        //         if (recordset[i].column_name == "id") {
-                        //             structure.employees[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
-                        //     }
-                        //     if (recordset[i].table_name == "gmhrs_department_view") {
-                        //         if (recordset[i].column_name == "id") {
-                        //             structure.departments[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
+                                if (recordset[i].column_name == "id") {
+                                    structure.employees[recordset[i].column_name] = (recordset[i].column_name)
+                                }
+                            }
+                            if (recordset[i].table_name == "gmhrs_department_view") {
+                                if (recordset[i].column_name == "id") {
+                                    structure.departments[recordset[i].column_name] = (recordset[i].column_name)
+                                }
 
-                        //         if (recordset[i].column_name == "name" && recordset[i].character_maximum_length <= 200) {
-                        //             structure.departments[recordset[i].column_name] = (recordset[i].column_name)
-                        //         } else if (recordset[i].column_name == "name" && recordset[i].character_maximum_length > 200) {
-                        //             structure.character_maximum_length_department[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
+                                if (recordset[i].column_name == "name" && recordset[i].character_maximum_length <= 200) {
+                                    structure.departments[recordset[i].column_name] = (recordset[i].column_name)
+                                } else if (recordset[i].column_name == "name" && recordset[i].character_maximum_length > 200) {
+                                    structure.character_maximum_length_department[recordset[i].column_name] = (recordset[i].column_name)
+                                }
 
-                        //         if (recordset[i].column_name == "email" && recordset[i].character_maximum_length <= 254) {
-                        //             structure.departments[recordset[i].column_name] = (recordset[i].column_name)
-                        //         } else if (recordset[i].column_name == "email" && recordset[i].character_maximum_length > 254) {
-                        //             structure.character_maximum_length_department[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
-                        //     }
-                        //     if (recordset[i].table_name == "gmhrs_team_view") {
-                        //         if (recordset[i].column_name == "id") {
-                        //             structure.teams[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
+                                if (recordset[i].column_name == "email" && recordset[i].character_maximum_length <= 254) {
+                                    structure.departments[recordset[i].column_name] = (recordset[i].column_name)
+                                } else if (recordset[i].column_name == "email" && recordset[i].character_maximum_length > 254) {
+                                    structure.character_maximum_length_department[recordset[i].column_name] = (recordset[i].column_name)
+                                }
+                            }
+                            if (recordset[i].table_name == "gmhrs_team_view") {
+                                if (recordset[i].column_name == "id") {
+                                    structure.teams[recordset[i].column_name] = (recordset[i].column_name)
+                                }
 
-                        //         if (recordset[i].column_name == "name" && recordset[i].character_maximum_length <= 200) {
-                        //             structure.teams[recordset[i].column_name] = (recordset[i].column_name)
-                        //         } else if (recordset[i].column_name == "name" && recordset[i].character_maximum_length > 200) {
-                        //             structure.character_maximum_length_team[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
+                                if (recordset[i].column_name == "name" && recordset[i].character_maximum_length <= 200) {
+                                    structure.teams[recordset[i].column_name] = (recordset[i].column_name)
+                                } else if (recordset[i].column_name == "name" && recordset[i].character_maximum_length > 200) {
+                                    structure.character_maximum_length_team[recordset[i].column_name] = (recordset[i].column_name)
+                                }
 
-                        //         if (recordset[i].column_name == "email" && recordset[i].character_maximum_length <= 254) {
-                        //             structure.teams[recordset[i].column_name] = (recordset[i].column_name)
-                        //         } else if (recordset[i].column_name == "email" && recordset[i].character_maximum_length > 254) {
-                        //             structure.character_maximum_length_team[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
-                        //     }
-                        //     if (recordset[i].table_name == "gmhrs_team_employee_view") {
-                        //         structure.team_employee[recordset[i].column_name] = (recordset[i].column_name)
-                        //     }
-                        //     if (recordset[i].table_name == "gmhrs_position_view") {
-                        //         if (recordset[i].column_name == "id") {
-                        //             structure.positions[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
+                                if (recordset[i].column_name == "email" && recordset[i].character_maximum_length <= 254) {
+                                    structure.teams[recordset[i].column_name] = (recordset[i].column_name)
+                                } else if (recordset[i].column_name == "email" && recordset[i].character_maximum_length > 254) {
+                                    structure.character_maximum_length_team[recordset[i].column_name] = (recordset[i].column_name)
+                                }
+                            }
+                            if (recordset[i].table_name == "gmhrs_team_employee_view") {
+                                structure.team_employee[recordset[i].column_name] = (recordset[i].column_name)
+                            }
+                            if (recordset[i].table_name == "gmhrs_position_view") {
+                                if (recordset[i].column_name == "id") {
+                                    structure.positions[recordset[i].column_name] = (recordset[i].column_name)
+                                }
 
-                        //         if (recordset[i].column_name == "name" && recordset[i].character_maximum_length <= 200) {
-                        //             structure.positions[recordset[i].column_name] = (recordset[i].column_name)
-                        //         } else if (recordset[i].column_name == "name" && recordset[i].character_maximum_length > 200) {
-                        //             structure.character_maximum_length_position[recordset[i].column_name] = (recordset[i].column_name)
-                        //         }
-                        //     }
-                        //     if (recordset[i].table_name == "gmhrs_vacation_date_view") {
-                        //         structure.vacation_date[recordset[i].column_name] = (recordset[i].column_name)
-                        //     }
-                        // }
+                                if (recordset[i].column_name == "name" && recordset[i].character_maximum_length <= 200) {
+                                    structure.positions[recordset[i].column_name] = (recordset[i].column_name)
+                                } else if (recordset[i].column_name == "name" && recordset[i].character_maximum_length > 200) {
+                                    structure.character_maximum_length_position[recordset[i].column_name] = (recordset[i].column_name)
+                                }
+                            }
+                            if (recordset[i].table_name == "gmhrs_vacation_date_view") {
+                                structure.vacation_date[recordset[i].column_name] = (recordset[i].column_name)
+                            }
+                        }
                     });
                 });
                 res.json(structure);
@@ -573,7 +585,7 @@ router.put("/", async (req, res) => {
                 "LEFT OUTER JOIN " + mappingResult[0].tableHR.nametableHR + " AS `members->" + mappingResult[0].tableHR.nametableHR + "` ON members." + mappingResult[3].tableHR.fields.employee_id + " = `members->" + mappingResult[0].tableHR.nametableHR + "`." + mappingResult[0].tableHR.fields.id + " WHERE team.status_id = 1 ORDER BY team." + mappingResult[2].tableHR.fields.email + " ASC"
 
 
-            const connection_mapping_query = '"employeeQuery:' + empQuery + 'vacationQuery:' + vacationQuery + 'departmentQuery:' + departmentQuery + 'positionQuery:' + positionQuery + 'teamQuery:' + teamQuery + '"'
+            const connection_mapping_query = '"Query:' + empQuery + 'Query:' + vacationQuery + 'Query:' + departmentQuery + 'Query:' + positionQuery + 'Query:' + teamQuery + '"'
             // var crypQuery = "'" + crypto.AES.encrypt(connection_mapping_query, "Zz@123456") + "'";
             const querySaveData = "update account set connection_database = " + dbConnect + ", connection_mapping_query = " + connection_mapping_query + " where id = " + accountId;
             await connectionString.query(querySaveData, (err, result, fields) => {
@@ -598,6 +610,11 @@ router.get("/", async (req, res) => {
     // const accountId = req.query.accountId;
     // const connection_database = null;
     // const connection_mapping_query = null;
+    var employee = null;
+    var vacation = null;
+    var department = null;
+    var position = null;
+    var team = null;
 
     try {
         const dbInfo = {
@@ -643,7 +660,13 @@ router.get("/", async (req, res) => {
                     console.log(err);
                 }
                 connection_database = result[0].connection_database;
+                console.log(connection_database);
                 connection_mapping_query = result[0].connection_mapping_query
+                employee = connection_mapping_query.split("Query:")[1];
+                vacation = connection_mapping_query.split("Query:")[2];
+                department = connection_mapping_query.split("Query:")[3];
+                position = connection_mapping_query.split("Query:")[4];
+                team = connection_mapping_query.split("Query:")[5];
 
                 // var query = crypto.AES.decrypt(connection_mapping_query, "Zz@123456");
                 // console.log(query);
@@ -655,204 +678,208 @@ router.get("/", async (req, res) => {
                 })
                 return;
             })
+
+            //employee data
+            var employeeResponse;
+            var employeeResult
+            await connectionString.query(employee, (err, result, fields) => {
+                if (err) {
+                    console.log(err);
+                }
+                employeeResponse = result;
+                employeeResult = [
+                    {
+                        id: employeeResponse[0][mappingResult[0].tableHR.fields.id],
+                        primary_email: employeeResponse[0][mappingResult[0].tableHR.fields.primary_email],
+                        personal_email: employeeResponse[0][mappingResult[0].tableHR.fields.personal_email],
+                        first_name: employeeResponse[0][mappingResult[0].tableHR.fields.first_name],
+                        last_name: employeeResponse[0][mappingResult[0].tableHR.fields.last_name],
+                        modified_date: employeeResponse[0].modified_date,
+                        address: employeeResponse[0][mappingResult[0].tableHR.fields.address],
+                        position_id: employeeResponse[0][mappingResult[0].tableHR.fields.position_id],
+                        department_id: employeeResponse[0][mappingResult[0].tableHR.fields.department_id],
+                        phone: employeeResponse[0][mappingResult[0].tableHR.fields.phone],
+                        status_id: employeeResponse[0].status_id,
+                        vacation_start_date: null,
+                        vacation_end_date: null,
+                        department: {
+                            id: employeeResponse[0].departmentId,
+                            name: employeeResponse[0].department_name,
+                            email: employeeResponse[0].department_email
+                        },
+                        position: {
+                            id: employeeResponse[0].position_id,
+                            name: employeeResponse[0].position_name
+                        },
+                        // teams: [
+
+                        // ]
+                    }
+                ]
+                var index = 0
+                //bo team
+                while (index < employeeResponse.length) {
+                    var teamLength = 0;
+                    for (let i = 0; i < employeeResponse.length; i++) {
+                        if (employeeResult[teamLength].id === employeeResponse[i][mappingResult[0].tableHR.fields.id]) {
+                            // var teamid = { team_id: employeeResponse[i].teams_team_id };
+                            // employeeResult[teamLength].teams.push(teamid);
+                            index = index + 1;
+                        } else if (employeeResult[teamLength].id !== employeeResponse[i].id) {
+                            var newEmp = {
+                                id: employeeResponse[i][mappingResult[0].tableHR.fields.id],
+                                primary_email: employeeResponse[i][mappingResult[0].tableHR.fields.primary_email],
+                                personal_email: employeeResponse[i][mappingResult[0].tableHR.fields.personal_email],
+                                first_name: employeeResponse[i][mappingResult[0].tableHR.fields.first_name],
+                                last_name: employeeResponse[i][mappingResult[0].tableHR.fields.last_name],
+                                modified_date: employeeResponse[i].modified_date,
+                                address: employeeResponse[i][mappingResult[0].tableHR.fields.address],
+                                position_id: employeeResponse[i][mappingResult[0].tableHR.fields.position_id],
+                                department_id: employeeResponse[i][mappingResult[0].tableHR.fields.department_id],
+                                phone: employeeResponse[i][mappingResult[0].tableHR.fields.phone],
+                                status_id: employeeResponse[i].status_id,
+                                vacation_start_date: null,
+                                vacation_end_date: null,
+                                department: {
+                                    id: employeeResponse[i].departmentId,
+                                    name: employeeResponse[i].department_name,
+                                    email: employeeResponse[i].department_email
+                                },
+                                position: {
+                                    id: employeeResponse[i].position_id,
+                                    name: employeeResponse[i].position_name
+                                },
+                                // teams: [
+                                //     { team_id: employeeResponse[i].teams_team_id }
+                                // ]
+                            }
+                            employeeResult.push(newEmp);
+                            teamLength = teamLength + 1;
+                            index = index + 1;
+                        }
+                    }
+                }
+            })
+
+            //vacation data
+            await connectionString.query(vacation, (err, result, fields) => {
+                if (err) {
+                    console.log(err);
+                }
+                if (result.length > 0) {
+                    for (let i = 0; i < employeeResult.length; i++) {
+                        for (let j = 0; j < result.length; j++) {
+                            if (employeeResult[i]["id"] === result[j][mappingResult[5].tableHR.fields.employee_id]) {
+                                employeeResult[i]["vacation_start_date"] = result[j][mappingResult[5].tableHR.fields.start_date];
+                                employeeResult[i]["vacation_end_date"] = result[j][mappingResult[5].tableHR.fields.end_date];
+                            }
+                        }
+                    }
+                }
+                data.employees = employeeResult
+            })
+
+            //department daata
+            await connectionString.query(department, (err, result, fields) => {
+                if (err) {
+                    console.log(err);
+                }
+                var department = [];
+                for (let i = 0; i < result.length; i++) {
+                    var dep = {
+                        id: result[i][mappingResult[1].tableHR.fields.id],
+                        name: result[i][mappingResult[1].tableHR.fields.name],
+                        email: result[i][mappingResult[1].tableHR.fields.email]
+                    }
+                    department.push(dep)
+                }
+                data.departments = department
+            })
+
+            //team data
+            await connectionString.query(team, (err, result, fields) => {
+                if (err) {
+                    console.log(err);
+                }
+                var teamResult = [
+                    {
+                        id: result[0][mappingResult[2].tableHR.fields.id],
+                        name: result[0][mappingResult[2].tableHR.fields.name],
+                        email: result[0][mappingResult[2].tableHR.fields.email],
+                        description: result[0].description,
+                        members: []
+                    }
+                ];
+
+                var index = 0
+                //bo team
+                while (index < result.length) {
+                    var teamLength = 0;
+                    for (let i = 0; i < result.length; i++) {
+                        if (teamResult[teamLength].id === result[i].members_team_id) {
+                            var addMember = {
+                                employee_id: result[i].members_employee_id,
+                                employee: {
+                                    employee_id: result[i].members_employee_employee_id,
+                                    primary_email: result[i].members_employee_primary_email
+                                }
+                            }
+                            teamResult[teamLength].members.push(addMember)
+                            index = index + 1;
+                        } else if (teamResult[teamLength].id !== result[i].members_team_id) {
+                            var addTeam =
+                            {
+                                id: result[i][mappingResult[2].tableHR.fields.id],
+                                name: result[i][mappingResult[2].tableHR.fields.name],
+                                email: result[i][mappingResult[2].tableHR.fields.email],
+                                description: result[i].description,
+                                members: [
+                                    {
+                                        employee_id: result[i].members_employee_id,
+                                        employee: {
+                                            employee_id: result[i].members_employee_employee_id,
+                                            primary_email: result[i].members_employee_primary_email
+                                        }
+                                    }
+                                ]
+                            }
+                                ;
+                            teamResult.push(addTeam)
+                            teamLength = teamLength + 1;
+                            index = index + 1;
+                        }
+                    }
+                }
+                data.teams = teamResult
+
+            })
+
+            //position data
+            await connectionString.query(position, (err, result, fields) => {
+                if (err) {
+                    console.log(err);
+                }
+                var position = [];
+                for (let i = 0; i < result.length; i++) {
+                    var pos = {
+                        id: result[i][mappingResult[4].tableHR.fields.id],
+                        name: result[i][mappingResult[4].tableHR.fields.name],
+                    }
+                    position.push(pos)
+                }
+                data.positions = position
+                console.log(data);
+                res.json(data)
+                connectionString.destroy(function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                })
+            })
         }
 
 
-        //employee data
-        var employeeResponse;
-        var employeeResult
-        // await connectionString.query(empQuery, (err, result, fields) => {
-        //     if (err) {
-        //         console.log(err);
-        //     }
-        //     employeeResponse = result;
-        //     employeeResult = [
-        //         {
-        //             id: employeeResponse[0][mappingResult[0].tableHR.fields.id],
-        //             primary_email: employeeResponse[0][mappingResult[0].tableHR.fields.primary_email],
-        //             personal_email: employeeResponse[0][mappingResult[0].tableHR.fields.personal_email],
-        //             first_name: employeeResponse[0][mappingResult[0].tableHR.fields.first_name],
-        //             last_name: employeeResponse[0][mappingResult[0].tableHR.fields.last_name],
-        //             modified_date: employeeResponse[0].modified_date,
-        //             address: employeeResponse[0][mappingResult[0].tableHR.fields.address],
-        //             position_id: employeeResponse[0][mappingResult[0].tableHR.fields.position_id],
-        //             department_id: employeeResponse[0][mappingResult[0].tableHR.fields.department_id],
-        //             phone: employeeResponse[0][mappingResult[0].tableHR.fields.phone],
-        //             status_id: employeeResponse[0].status_id,
-        //             vacation_start_date: null,
-        //             vacation_end_date: null,
-        //             department: {
-        //                 id: employeeResponse[0].departmentId,
-        //                 name: employeeResponse[0].department_name,
-        //                 email: employeeResponse[0].department_email
-        //             },
-        //             position: {
-        //                 id: employeeResponse[0].position_id,
-        //                 name: employeeResponse[0].position_name
-        //             },
-        //             // teams: [
 
-        //             // ]
-        //         }
-        //     ]
-        //     var index = 0
-        //     //bo team
-        //     while (index < employeeResponse.length) {
-        //         var teamLength = 0;
-        //         for (let i = 0; i < employeeResponse.length; i++) {
-        //             if (employeeResult[teamLength].id === employeeResponse[i][mappingResult[0].tableHR.fields.id]) {
-        //                 // var teamid = { team_id: employeeResponse[i].teams_team_id };
-        //                 // employeeResult[teamLength].teams.push(teamid);
-        //                 index = index + 1;
-        //             } else if (employeeResult[teamLength].id !== employeeResponse[i].id) {
-        //                 var newEmp = {
-        //                     id: employeeResponse[i][mappingResult[0].tableHR.fields.id],
-        //                     primary_email: employeeResponse[i][mappingResult[0].tableHR.fields.primary_email],
-        //                     personal_email: employeeResponse[i][mappingResult[0].tableHR.fields.personal_email],
-        //                     first_name: employeeResponse[i][mappingResult[0].tableHR.fields.first_name],
-        //                     last_name: employeeResponse[i][mappingResult[0].tableHR.fields.last_name],
-        //                     modified_date: employeeResponse[i].modified_date,
-        //                     address: employeeResponse[i][mappingResult[0].tableHR.fields.address],
-        //                     position_id: employeeResponse[i][mappingResult[0].tableHR.fields.position_id],
-        //                     department_id: employeeResponse[i][mappingResult[0].tableHR.fields.department_id],
-        //                     phone: employeeResponse[i][mappingResult[0].tableHR.fields.phone],
-        //                     status_id: employeeResponse[i].status_id,
-        //                     vacation_start_date: null,
-        //                     vacation_end_date: null,
-        //                     department: {
-        //                         id: employeeResponse[i].departmentId,
-        //                         name: employeeResponse[i].department_name,
-        //                         email: employeeResponse[i].department_email
-        //                     },
-        //                     position: {
-        //                         id: employeeResponse[i].position_id,
-        //                         name: employeeResponse[i].position_name
-        //                     },
-        //                     // teams: [
-        //                     //     { team_id: employeeResponse[i].teams_team_id }
-        //                     // ]
-        //                 }
-        //                 employeeResult.push(newEmp);
-        //                 teamLength = teamLength + 1;
-        //                 index = index + 1;
-        //             }
-        //         }
-        //     }
-        // })
-
-        // //vacation data
-        // await connectionString.query(vacationQuery, (err, result, fields) => {
-        //     if (err) {
-        //         console.log(err);
-        //     }
-        //     if (result.length > 0) {
-        //         for (let i = 0; i < employeeResult.length; i++) {
-        //             for (let j = 0; j < result.length; j++) {
-        //                 if (employeeResult[i]["id"] === result[j][mappingResult[5].tableHR.fields.employee_id]) {
-        //                     employeeResult[i]["vacation_start_date"] = result[j][mappingResult[5].tableHR.fields.start_date];
-        //                     employeeResult[i]["vacation_end_date"] = result[j][mappingResult[5].tableHR.fields.end_date];
-        //                 }
-        //             }
-        //         }
-        //     }
-        //     data.employees = employeeResult
-        // })
-
-        // //department daata
-        // await connectionString.query(departmentQuery, (err, result, fields) => {
-        //     if (err) {
-        //         console.log(err);
-        //     }
-        //     var department = [];
-        //     for (let i = 0; i < result.length; i++) {
-        //         var dep = {
-        //             id: result[i][mappingResult[1].tableHR.fields.id],
-        //             name: result[i][mappingResult[1].tableHR.fields.name],
-        //             email: result[i][mappingResult[1].tableHR.fields.email]
-        //         }
-        //         department.push(dep)
-        //     }
-        //     data.departments = department
-        // })
-
-        // //team data
-        // await connectionString.query(teamQuery, (err, result, fields) => {
-        //     if (err) {
-        //         console.log(err);
-        //     }
-        //     var teamResult = [
-        //         {
-        //             id: result[0][mappingResult[2].tableHR.fields.id],
-        //             name: result[0][mappingResult[2].tableHR.fields.name],
-        //             email: result[0][mappingResult[2].tableHR.fields.email],
-        //             description: result[0].description,
-        //             members: []
-        //         }
-        //     ];
-
-        //     var index = 0
-        //     //bo team
-        //     while (index < result.length) {
-        //         var teamLength = 0;
-        //         for (let i = 0; i < result.length; i++) {
-        //             if (teamResult[teamLength].id === result[i].members_team_id) {
-        //                 var addMember = {
-        //                     employee_id: result[i].members_employee_id,
-        //                     employee: {
-        //                         employee_id: result[i].members_employee_employee_id,
-        //                         primary_email: result[i].members_employee_primary_email
-        //                     }
-        //                 }
-        //                 teamResult[teamLength].members.push(addMember)
-        //                 index = index + 1;
-        //             } else if (teamResult[teamLength].id !== result[i].members_team_id) {
-        //                 var addTeam =
-        //                 {
-        //                     id: result[i][mappingResult[2].tableHR.fields.id],
-        //                     name: result[i][mappingResult[2].tableHR.fields.name],
-        //                     email: result[i][mappingResult[2].tableHR.fields.email],
-        //                     description: result[i].description,
-        //                     members: [
-        //                         {
-        //                             employee_id: result[i].members_employee_id,
-        //                             employee: {
-        //                                 employee_id: result[i].members_employee_employee_id,
-        //                                 primary_email: result[i].members_employee_primary_email
-        //                             }
-        //                         }
-        //                     ]
-        //                 }
-        //                     ;
-        //                 teamResult.push(addTeam)
-        //                 teamLength = teamLength + 1;
-        //                 index = index + 1;
-        //             }
-        //         }
-        //     }
-        //     data.teams = teamResult
-        //     connectionString.destroy(function (err) {
-        //         if (err) {
-        //             console.log(err);
-        //         }
-        //     })
-        // })
-
-        // //position data
-        // await connectionString.query(positionQuery, (err, result, fields) => {
-        // if (err) {
-        //     console.log(err);
-        // }
-        // var position = [];
-        // for (let i = 0; i < result.length; i++) {
-        //     var pos = {
-        //         id: result[i][mappingResult[4].tableHR.fields.id],
-        //         name: result[i][mappingResult[4].tableHR.fields.name],
-        //     }
-        //     position.push(pos)
-        // }
-        // data.positions = position
-        // console.log(data);
-        // })
     } catch (err) {
         console.log(err.message);
         res.send("Server error");
