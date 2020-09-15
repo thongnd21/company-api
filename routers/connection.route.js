@@ -592,12 +592,28 @@ router.put("/", async (req, res) => {
                 if (err) {
                     console.log(err);
                 }
-                console.log(result);
+                var check = result;
                 connectionString.destroy(function (err) {
                     if (err) {
                         console.log(err);
                     }
                 })
+                if (check) {
+                    var response = {
+                        code: 200,
+                        status: "Save mapping sucessfully!"
+                    }
+                    res.json(response);
+                    return;
+                } else {
+                    var response = {
+                        code: 500,
+                        status: "Save mapping fail!"
+                    }
+                    res.json(response);
+                    return;
+                }
+
             })
         }
     } catch (error) {
