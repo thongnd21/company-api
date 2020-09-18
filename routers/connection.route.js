@@ -2,6 +2,7 @@ const express = require("express");
 const testConnectionDao = require("../company-daos/testConnection.dao");
 const router = express.Router();
 const sql_connection = require('mysql');
+const mysql = require('mysql');
 const employee = require('../companyModels/Employees');
 const department = require('../companyModels/Department');
 const team = require('../companyModels/Team');
@@ -623,7 +624,7 @@ router.put("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-    // const accountId = req.query.accountId;
+    const accountId = req.query.accountId;
     // const connection_database = null;
     // const connection_mapping_query = null;
     var employee = null;
@@ -640,6 +641,14 @@ router.get("/", async (req, res) => {
             username: 'root',
             password: 'Zz@123456',
             dialect: 'mysql'
+        }
+        var dbInfoHR = {
+            dbName: null,
+            host: null,
+            port: null,
+            username: null,
+            password: null,
+            dialect: null
         }
         var check = await testConnectionDao.checkConnection(dbInfo);
         console.log(check);
@@ -667,16 +676,23 @@ router.get("/", async (req, res) => {
             // connect db
             await connectionString.connect(function (err) {
                 if (err)
-                    console.log('error when connecting to db:', err);
+                    console.log('error when connecting to db gm:', err);
 
             });
-            const queryDBGMHRS = "select connection_database,connection_mapping_query from account where id = 1";
+            const queryDBGMHRS = "select connection_database,connection_mapping_query from account where id = " + accountId;
+            console.log(queryDBGMHRS);
             await connectionString.query(queryDBGMHRS, (err, result, fields) => {
                 if (err) {
-                    console.log(err);
+                    console.log("select" + err);
                 }
                 connection_database = result[0].connection_database;
-                console.log(connection_database);
+                dbInfoHR.dbName = result[0].connection_database.split(" ")[0];
+                dbInfoHR.host = result[0].connection_database.split(" ")[1];
+                dbInfoHR.port = result[0].connection_database.split(" ")[2];
+                dbInfoHR.username = result[0].connection_database.split(" ")[3];
+                dbInfoHR.password = result[0].connection_database.split(" ")[4];
+                // dbInfoHR.dialect = result[0].connection_database.split(" ")[5];
+                console.log(dbInfoHR);
                 connection_mapping_query = result[0].connection_mapping_query
                 employee = connection_mapping_query.split("Query:")[1];
                 vacation = connection_mapping_query.split("Query:")[2];
@@ -690,15 +706,33 @@ router.get("/", async (req, res) => {
                     if (err) {
                         console.log(err);
                     }
-                    var a = result
                 })
-                return;
             })
 
+
+            const connectionStringHR = await sql_connection.createConnection({
+                host: dbInfoHR.host,
+                user: dbInfoHR.username,
+                password: dbInfoHR.password,
+                database: dbInfoHR.dbName,
+                port: dbInfoHR.port,
+                timestamps: false,
+                pool: {
+                    max: 5,
+                    min: 0,
+                    acquire: 30000,
+                    idle: 10000
+                }
+            })
+            await connectionStringHR.connect(function (err) {
+                if (err)
+                    console.log('error when connecting to db hr:', err);
+
+            });
             //employee data
             var employeeResponse;
             var employeeResult
-            await connectionString.query(employee, (err, result, fields) => {
+            await connectionStringHR.query(employee, (err, result, fields) => {
                 if (err) {
                     console.log(err);
                 }
@@ -778,7 +812,7 @@ router.get("/", async (req, res) => {
             })
 
             //vacation data
-            await connectionString.query(vacation, (err, result, fields) => {
+            await connectionStringHR.query(vacation, (err, result, fields) => {
                 if (err) {
                     console.log(err);
                 }
@@ -796,7 +830,7 @@ router.get("/", async (req, res) => {
             })
 
             //department daata
-            await connectionString.query(department, (err, result, fields) => {
+            await connectionStringHR.query(department, (err, result, fields) => {
                 if (err) {
                     console.log(err);
                 }
@@ -813,7 +847,7 @@ router.get("/", async (req, res) => {
             })
 
             //team data
-            await connectionString.query(team, (err, result, fields) => {
+            await connectionStringHR.query(team, (err, result, fields) => {
                 if (err) {
                     console.log(err);
                 }
@@ -871,7 +905,7 @@ router.get("/", async (req, res) => {
             })
 
             //position data
-            await connectionString.query(position, (err, result, fields) => {
+            await connectionStringHR.query(position, (err, result, fields) => {
                 if (err) {
                     console.log(err);
                 }
@@ -886,7 +920,7 @@ router.get("/", async (req, res) => {
                 data.positions = position
                 console.log(data);
                 res.json(data)
-                connectionString.destroy(function (err) {
+                connectionStringHR.destroy(function (err) {
                     if (err) {
                         console.log(err);
                     }
