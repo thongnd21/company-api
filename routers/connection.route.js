@@ -649,15 +649,15 @@ router.post("/data", async (req, res) => {
         department = query.split("Query:")[3];
         position = query.split("Query:")[4];
         team = query.split("Query:")[5];
-        // var check = await testConnectionDao.checkConnection(dbInfo);
-        // console.log(check);
+        var check = await testConnectionDao.checkConnection(dbInfo);
+        console.log(check);
         var data = {
             employees: [],
             teams: [],
             departments: [],
             positions: []
         }
-        // if (check === true) {
+        if (check === true) {
             const connectionString = sql_connection.createConnection({
                 host: dbInfo.host,
                 user: dbInfo.username,
@@ -905,7 +905,7 @@ router.post("/data", async (req, res) => {
                     }
                 })
             })
-        // }
+        }
 
 
 
