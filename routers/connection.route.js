@@ -446,15 +446,15 @@ router.put("/", async (req, res) => {
                 {
                     nametableHR: mappingReq[0].tableHR.nametableHR,
                     fields: {
-                        id: mappingReq[0].tableHR.fields[0].id,
-                        primary_email: mappingReq[0].tableHR.fields[1].primary_email,
-                        personal_email: mappingReq[0].tableHR.fields[2].personal_email,
-                        first_name: mappingReq[0].tableHR.fields[3].first_name,
-                        last_name: mappingReq[0].tableHR.fields[4].last_name,
-                        phone: mappingReq[0].tableHR.fields[5].phone,
-                        address: mappingReq[0].tableHR.fields[6].address,
-                        position_id: mappingReq[0].tableHR.fields[7].position_id,
-                        department_id: mappingReq[0].tableHR.fields[8].department_id
+                        id: mappingReq[0].tableHR.fields[0],
+                        primary_email: mappingReq[0].tableHR.fields[1],
+                        personal_email: mappingReq[0].tableHR.fields[2],
+                        first_name: mappingReq[0].tableHR.fields[3],
+                        last_name: mappingReq[0].tableHR.fields[4],
+                        phone: mappingReq[0].tableHR.fields[5],
+                        address: mappingReq[0].tableHR.fields[6],
+                        position_id: mappingReq[0].tableHR.fields[7],
+                        department_id: mappingReq[0].tableHR.fields[8]
                     }
                 }
             },
@@ -465,9 +465,9 @@ router.put("/", async (req, res) => {
                     nametableHR: mappingReq[1].tableHR.nametableHR,
                     fields:
                     {
-                        id: mappingReq[1].tableHR.fields[0].id,
-                        name: mappingReq[1].tableHR.fields[1].name,
-                        email: mappingReq[1].tableHR.fields[2].email
+                        id: mappingReq[1].tableHR.fields[0],
+                        name: mappingReq[1].tableHR.fields[1],
+                        email: mappingReq[1].tableHR.fields[2]
                     }
 
                 }
@@ -479,9 +479,9 @@ router.put("/", async (req, res) => {
                     nametableHR: mappingReq[2].tableHR.nametableHR,
                     fields:
                     {
-                        id: mappingReq[2].tableHR.fields[0].id,
-                        name: mappingReq[2].tableHR.fields[1].name,
-                        email: mappingReq[2].tableHR.fields[2].email
+                        id: mappingReq[2].tableHR.fields[0],
+                        name: mappingReq[2].tableHR.fields[1],
+                        email: mappingReq[2].tableHR.fields[2]
                     }
 
                 }
@@ -493,8 +493,8 @@ router.put("/", async (req, res) => {
                     nametableHR: mappingReq[3].tableHR.nametableHR,
                     fields:
                     {
-                        employee_id: mappingReq[3].tableHR.fields[0].employee_id,
-                        team_id: mappingReq[3].tableHR.fields[1].team_id
+                        employee_id: mappingReq[3].tableHR.fields[0],
+                        team_id: mappingReq[3].tableHR.fields[1]
                     },
 
                 }
@@ -506,8 +506,8 @@ router.put("/", async (req, res) => {
                     nametableHR: mappingReq[4].tableHR.nametableHR,
                     fields:
                     {
-                        id: mappingReq[4].tableHR.fields[0].id,
-                        name: mappingReq[4].tableHR.fields[1].name
+                        id: mappingReq[4].tableHR.fields[0],
+                        name: mappingReq[4].tableHR.fields[1]
                     }
                 }
             },
@@ -518,9 +518,9 @@ router.put("/", async (req, res) => {
                     nametableHR: mappingReq[5].tableHR.nametableHR,
                     fields:
                     {
-                        employee_id: mappingReq[5].tableHR.fields[0].employee_id,
-                        start_date: mappingReq[5].tableHR.fields[1].start_date,
-                        end_date: mappingReq[5].tableHR.fields[2].end_date
+                        employee_id: mappingReq[5].tableHR.fields[0],
+                        start_date: mappingReq[5].tableHR.fields[1],
+                        end_date: mappingReq[5].tableHR.fields[2]
                     }
 
                 }
