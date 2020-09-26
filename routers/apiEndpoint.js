@@ -98,15 +98,15 @@ router.get('/', async (req, res) => {
                 where: { status_id: 1 }
             });
     
-            const sql = "SELECT id, created_date, employee_id, start_date, end_date FROM vacation_date AS vacation_date WHERE (current_date() between date(vacation_date.start_date) and date(vacation_date.end_date)) OR date(vacation_date.start_date) >= current_date() ORDER BY vacation_date.start_date DESC";
+            const sql = "SELECT id, created_date, employee_id, start_date, end_date FROM gmhrs_vacation_date_view AS vacation_date WHERE (current_date() between date(vacation_date.start_date) and date(vacation_date.end_date)) OR date(vacation_date.start_date) >= current_date() ORDER BY vacation_date.start_date DESC";
             const vacation = await vac.sequelize.query(sql, { type: sequelize.QueryTypes.SELECT });
             // console.log(today.toISOString().substring(0, 10));
             if (vacation.length > 0) {
                 for (let i = 0; i < employeeResponse.length; i++) {
                     for (let j = 0; j < vacation.length; j++) {
                         if (employeeResponse[i].id === vacation[j].employee_id) {
-                            employeeResponse[i].vacation_start_date = vacation[j].start_date;
-                            employeeResponse[i].vacation_end_date = vacation[j].end_date;
+                            employeeResponse[i]["vacation_start_date"] = vacation[j].start_date ? vacation[j].start_date : null;
+                            employeeResponse[i]["vacation_end_date"] = vacation[j].end_date ? vacation[j].end_date : null;
                         }
                     }
                 }

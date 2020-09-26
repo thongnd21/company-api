@@ -438,7 +438,7 @@ router.put("/", async (req, res) => {
     console.log(accountId);
     console.log(dbHR);
     try {
-        var dbConnect = "'" + dbHR.dbName + " " + dbHR.host + " " + dbHR.port + " " + dbHR.username + " " + dbHR.password + " " + dbHR.dialect + "'";
+        var dbConnect = '"' + dbHR.dbName + " " + dbHR.host + " " + dbHR.port + " " + dbHR.username + " " + dbHR.password + " " + dbHR.dialect + '"';
         var mappingResult = [
             {
                 tableGM: "gmhrs_employee_view",
@@ -586,9 +586,16 @@ router.put("/", async (req, res) => {
                 "LEFT OUTER JOIN " + mappingResult[0].tableHR.nametableHR + " AS `members->" + mappingResult[0].tableHR.nametableHR + "` ON members." + mappingResult[3].tableHR.fields.employee_id + " = `members->" + mappingResult[0].tableHR.nametableHR + "`." + mappingResult[0].tableHR.fields.id + " WHERE team.status_id = 1 ORDER BY team." + mappingResult[2].tableHR.fields.email + " ASC "
 
 
-            const connection_mapping_query = '"Query:' + empQuery + 'Query:' + vacationQuery + 'Query:' + departmentQuery + 'Query:' + positionQuery + 'Query:' + teamQuery + '"'
+            const connection_mapping_query = '"Query:' + empQuery + 'Query:' + vacationQuery + 'Query:' + departmentQuery + 'Query:' + positionQuery + 'Query:' + teamQuery + '"';
+            const connection_mapping_configuration = '"'+mappingResult[0].tableHR.nametableHR + ":" + mappingResult[0].tableHR.fields.id + "," + mappingResult[0].tableHR.fields.primary_email + "," + mappingResult[0].tableHR.fields.personal_email + "," + mappingResult[0].tableHR.fields.first_name + "," + mappingResult[0].tableHR.fields.last_name + "," +
+                mappingResult[0].tableHR.fields.phone + "," + mappingResult[0].tableHR.fields.address + "," + mappingResult[0].tableHR.fields.position_id + "," + mappingResult[0].tableHR.fields.department_id + " " +
+                mappingResult[1].tableHR.nametableHR + ":" + mappingResult[1].tableHR.fields.id + "," + mappingResult[1].tableHR.fields.name + "," + mappingResult[1].tableHR.fields.email + " " +
+                mappingResult[2].tableHR.nametableHR + ":" + mappingResult[2].tableHR.fields.id + "," + mappingResult[2].tableHR.fields.name + "," + mappingResult[2].tableHR.fields.email + " " +
+                mappingResult[3].tableHR.nametableHR + ":" + mappingResult[3].tableHR.fields.employee_id + "," + mappingResult[3].tableHR.fields.team_id + " " +
+                mappingResult[4].tableHR.nametableHR + ":" + mappingResult[4].tableHR.fields.id + "," + mappingResult[2].tableHR.fields.name + " " +
+                mappingResult[5].tableHR.nametableHR + ":" + mappingResult[5].tableHR.fields.employee_id + "," + mappingResult[5].tableHR.fields.start_date + "," + mappingResult[5].tableHR.fields.end_date+ '"'
             // var crypQuery = "'" + crypto.AES.encrypt(connection_mapping_query, "Zz@123456") + "'";
-            const querySaveData = "update account set connection_database = " + dbConnect + ", connection_mapping_query = " + connection_mapping_query + " where id = " + accountId;
+            const querySaveData = "update account set connection_database = " + dbConnect + ", connection_mapping_query = " + connection_mapping_query + ", connection_mapping_configuration = " + connection_mapping_configuration + " where id = " + accountId;
             await connectionString.query(querySaveData, (err, result, fields) => {
                 if (err) {
                     console.log(err);
