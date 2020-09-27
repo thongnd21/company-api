@@ -14,6 +14,9 @@ const position = require('../company-daos/position.dao');
 const mssql = require('mssql');
 const crypto = require('crypto-js');
 
+const contants = require('./../contants/contants');
+const deCrypt = require('./../common-encrypt-decrypt/de')
+
 router.post("/", async (req, res) => {
     const dbInfo = req.body;
     try {
@@ -587,15 +590,18 @@ router.put("/", async (req, res) => {
 
 
             const connection_mapping_query = '"Query:' + empQuery + 'Query:' + vacationQuery + 'Query:' + departmentQuery + 'Query:' + positionQuery + 'Query:' + teamQuery + '"';
-            const connection_mapping_configuration = '"'+mappingResult[0].tableHR.nametableHR + ":" + mappingResult[0].tableHR.fields.id + "," + mappingResult[0].tableHR.fields.primary_email + "," + mappingResult[0].tableHR.fields.personal_email + "," + mappingResult[0].tableHR.fields.first_name + "," + mappingResult[0].tableHR.fields.last_name + "," +
+            const connection_mapping_configuration = '"' + mappingResult[0].tableHR.nametableHR + ":" + mappingResult[0].tableHR.fields.id + "," + mappingResult[0].tableHR.fields.primary_email + "," + mappingResult[0].tableHR.fields.personal_email + "," + mappingResult[0].tableHR.fields.first_name + "," + mappingResult[0].tableHR.fields.last_name + "," +
                 mappingResult[0].tableHR.fields.phone + "," + mappingResult[0].tableHR.fields.address + "," + mappingResult[0].tableHR.fields.position_id + "," + mappingResult[0].tableHR.fields.department_id + " " +
                 mappingResult[1].tableHR.nametableHR + ":" + mappingResult[1].tableHR.fields.id + "," + mappingResult[1].tableHR.fields.name + "," + mappingResult[1].tableHR.fields.email + " " +
                 mappingResult[2].tableHR.nametableHR + ":" + mappingResult[2].tableHR.fields.id + "," + mappingResult[2].tableHR.fields.name + "," + mappingResult[2].tableHR.fields.email + " " +
                 mappingResult[3].tableHR.nametableHR + ":" + mappingResult[3].tableHR.fields.employee_id + "," + mappingResult[3].tableHR.fields.team_id + " " +
                 mappingResult[4].tableHR.nametableHR + ":" + mappingResult[4].tableHR.fields.id + "," + mappingResult[2].tableHR.fields.name + " " +
-                mappingResult[5].tableHR.nametableHR + ":" + mappingResult[5].tableHR.fields.employee_id + "," + mappingResult[5].tableHR.fields.start_date + "," + mappingResult[5].tableHR.fields.end_date+ '"'
+                mappingResult[5].tableHR.nametableHR + ":" + mappingResult[5].tableHR.fields.employee_id + "," + mappingResult[5].tableHR.fields.start_date + "," + mappingResult[5].tableHR.fields.end_date + '"'
             // var crypQuery = "'" + crypto.AES.encrypt(connection_mapping_query, "Zz@123456") + "'";
-            const querySaveData = "update account set connection_database = " + dbConnect + ", connection_mapping_query = " + connection_mapping_query + ", connection_mapping_configuration = " + connection_mapping_configuration + " where id = " + accountId;
+
+            const iv = crypto.randomBytes(16);
+            const encryptedDB = await deCrypt.encrypt(dbConnect, iv, contants.private_key);
+            const querySaveData = "update account set connection_database = " + encryptedDB + ", connection_mapping_query = " + connection_mapping_query + ", connection_mapping_configuration = " + connection_mapping_configuration + " where id = " + accountId;
             await connectionString.query(querySaveData, (err, result, fields) => {
                 if (err) {
                     console.log(err);
