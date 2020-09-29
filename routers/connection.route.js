@@ -602,7 +602,7 @@ router.put("/", async (req, res) => {
 
             const iv = cryptoDE.randomBytes(16);
             const encryptedDB = await deCrypt.encrypt(dbConnect, iv, contants.private_key);
-            const querySaveData = "update account set connection_database = '" + encryptedDB + "', connection_mapping_query = " + connection_mapping_query + ", connection_mapping_configuration = " + connection_mapping_configuration + ", method_auth_connection = 'DB'" + " where id = " + accountId;
+            const querySaveData = "update account set connection_database = '" + encryptedDB + "', connection_mapping_query = " + connection_mapping_query + ", connection_mapping_configuration = " + connection_mapping_configuration + ", method_auth_connection = 'DBM'" + " where id = " + accountId;
             await connectionString.query(querySaveData, (err, result, fields) => {
                 if (err) {
                     console.log(err);
