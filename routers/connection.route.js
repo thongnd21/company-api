@@ -13,6 +13,7 @@ const team_dao = require('../company-daos/team.dao');
 const position = require('../company-daos/position.dao');
 const mssql = require('mssql');
 const crypto = require('crypto-js');
+const cryptoDE = require('crypto');
 
 const contants = require('./../contants/contants');
 const deCrypt = require('./../common-encrypt-decrypt/de')
@@ -441,7 +442,7 @@ router.put("/", async (req, res) => {
     console.log(accountId);
     console.log(dbHR);
     try {
-        var dbConnect = '"' + dbHR.dbName + " " + dbHR.host + " " + dbHR.port + " " + dbHR.username + " " + dbHR.password + " " + dbHR.dialect + '"';
+        var dbConnect = dbHR.dbName + " " + dbHR.host + " " + dbHR.port + " " + dbHR.username + " " + dbHR.password + " " + dbHR.dialect;
         var mappingResult = [
             {
                 tableGM: "gmhrs_employee_view",
@@ -599,9 +600,9 @@ router.put("/", async (req, res) => {
                 mappingResult[5].tableHR.nametableHR + ":" + mappingResult[5].tableHR.fields.employee_id + "," + mappingResult[5].tableHR.fields.start_date + "," + mappingResult[5].tableHR.fields.end_date + '"'
             // var crypQuery = "'" + crypto.AES.encrypt(connection_mapping_query, "Zz@123456") + "'";
 
-            const iv = crypto.randomBytes(16);
+            const iv = cryptoDE.randomBytes(16);
             const encryptedDB = await deCrypt.encrypt(dbConnect, iv, contants.private_key);
-            const querySaveData = "update account set connection_database = " + encryptedDB + ", connection_mapping_query = " + connection_mapping_query + ", connection_mapping_configuration = " + connection_mapping_configuration + " where id = " + accountId;
+            const querySaveData = "update account set connection_database = '" + encryptedDB + "', connection_mapping_query = " + connection_mapping_query + ", connection_mapping_configuration = " + connection_mapping_configuration + ", method_auth_connection = 'DB'" + " where id = " + accountId;
             await connectionString.query(querySaveData, (err, result, fields) => {
                 if (err) {
                     console.log(err);
