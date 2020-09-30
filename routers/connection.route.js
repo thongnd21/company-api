@@ -583,12 +583,18 @@ router.put("/", async (req, res) => {
 
 
             //team query
+            // SELECT team.id, team.name, team.email, team.created_date, team.status_id, team.modified_date, team.description, members.team_id AS members_team_id, members.employee_id AS members_employee_id, members.modified_date AS
+            // members_modified_date, `members->employee`.id AS members_employee_id, `members->employee`.primary_email AS members_employee_primary_email,
+            // `members->employee`.id AS members_employee_employee_id FROM gmhrs_team_view AS team
+            // LEFT OUTER JOIN(gmhrs_team_employee_view AS members  INNER JOIN gmhrs_employee_view AS`members->employee` ON members.employee_id = `members->employee`.id AND`members->employee`.status_id = 1) ON team.id = members.team_id
+            // WHERE team.status_id = 1  ORDER BY team.email ASC;
             const teamQuery = "SELECT team." + mappingResult[2].tableHR.fields.id + " as id, team." + mappingResult[2].tableHR.fields.name + " as name, team." + mappingResult[2].tableHR.fields.email + " as email, team.created_date, team.status_id, team.modified_date, team.description, " +
                 "members." + mappingResult[3].tableHR.fields.team_id + " AS members_team_id, members." + mappingResult[3].tableHR.fields.employee_id + " AS members_employee_id, members.modified_date AS members_modified_date, " +
-                "`members->" + mappingResult[0].tableHR.nametableHR + "`." + mappingResult[0].tableHR.fields.id + " AS members_employee_id, `members->" + mappingResult[0].tableHR.nametableHR + "`." + mappingResult[0].tableHR.fields.primary_email + " AS members_employee_primary_email, `members->" + mappingResult[0].tableHR.nametableHR + "`." + mappingResult[0].tableHR.fields.id + " " +
-                "AS members_employee_employee_id FROM " + mappingResult[2].tableHR.nametableHR + " AS team LEFT OUTER JOIN " + mappingResult[3].tableHR.nametableHR + " AS members ON team." + mappingResult[2].tableHR.fields.id + " = members.team_id " +
-                "LEFT OUTER JOIN " + mappingResult[0].tableHR.nametableHR + " AS `members->" + mappingResult[0].tableHR.nametableHR + "` ON members." + mappingResult[3].tableHR.fields.employee_id + " = `members->" + mappingResult[0].tableHR.nametableHR + "`." + mappingResult[0].tableHR.fields.id + " WHERE team.status_id = 1 ORDER BY team." + mappingResult[2].tableHR.fields.email + " ASC "
-
+                "`members->employee`." + mappingResult[0].tableHR.fields.id + " AS members_employee_id, `members->employee`." + mappingResult[0].tableHR.fields.primary_email + " AS members_employee_primary_email, `members->employee`." + mappingResult[0].tableHR.fields.id + " " +
+                "AS members_employee_employee_id FROM " + mappingResult[2].tableHR.nametableHR + " AS team " +
+                "LEFT OUTER JOIN (" + mappingResult[3].tableHR.nametableHR + " AS members INNER JOIN " + mappingResult[0].tableHR.nametableHR + " AS `members->employee` ON members." + mappingResult[3].tableHR.fields.employee_id + " = `members->employee`." + mappingResult[0].tableHR.fields.id + " AND `members->employee`.status_id = 1) ON team." + mappingResult[2].tableHR.fields.id + " = members." + mappingResult[3].tableHR.fields.team_id +
+                " WHERE team.status_id = 1 ORDER BY team." + mappingResult[2].tableHR.fields.email + " ASC "
+            console.log(teamQuery);
 
             const connection_mapping_query = '"Query:' + empQuery + 'Query:' + vacationQuery + 'Query:' + departmentQuery + 'Query:' + positionQuery + 'Query:' + teamQuery + '"';
             const connection_mapping_configuration = '"' + mappingResult[0].tableHR.nametableHR + ":" + mappingResult[0].tableHR.fields.id + "," + mappingResult[0].tableHR.fields.primary_email + "," + mappingResult[0].tableHR.fields.personal_email + "," + mappingResult[0].tableHR.fields.first_name + "," + mappingResult[0].tableHR.fields.last_name + "," +
@@ -599,6 +605,7 @@ router.put("/", async (req, res) => {
                 mappingResult[4].tableHR.nametableHR + ":" + mappingResult[4].tableHR.fields.id + "," + mappingResult[2].tableHR.fields.name + " " +
                 mappingResult[5].tableHR.nametableHR + ":" + mappingResult[5].tableHR.fields.employee_id + "," + mappingResult[5].tableHR.fields.start_date + "," + mappingResult[5].tableHR.fields.end_date + '"'
             // var crypQuery = "'" + crypto.AES.encrypt(connection_mapping_query, "Zz@123456") + "'";
+
 
             const iv = cryptoDE.randomBytes(16);
             const encryptedDB = await deCrypt.encrypt(dbConnect, iv, contants.private_key);
@@ -809,12 +816,15 @@ router.post("/data", async (req, res) => {
                 if (err) {
                     console.log(err);
                 }
+
                 if (result.length > 0) {
                     for (let i = 0; i < employeeResult.length; i++) {
                         for (let j = 0; j < result.length; j++) {
+                            console.log(employeeResult[i]["id"]);
+                            console.log(result);
                             if (employeeResult[i]["id"] === result[j].employee_id) {
-                                employeeResult[i]["vacation_start_date"] = result[j].start_date;
-                                employeeResult[i]["vacation_end_date"] = result[j].end_date;
+                                employeeResult[i]["vacation_start_date"] = result[j].start_date ? result[j].start_date : null;
+                                employeeResult[i]["vacation_end_date"] = result[j].end_date ? result[j].end_date : null;
                             }
                         }
                     }
@@ -911,7 +921,7 @@ router.post("/data", async (req, res) => {
                     position.push(pos)
                 }
                 data.positions = position
-                console.log(data);
+                // console.log(data);
                 res.json(data)
                 connectionString.destroy(function (err) {
                     if (err) {
