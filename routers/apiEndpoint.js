@@ -68,7 +68,7 @@ router.get('/', async (req, res) => {
                 positions: []
             }
             //get employees
-            var employeeResponse = await emp.findAll({
+            let employeeResponse = await emp.findAll({
                 attributes: ['id', 'primary_email', 'personal_email',
                     'first_name', 'last_name', 'modified_date', 'address', 'position_id',
                     'department_id', 'phone', 'status_id', 'vacation_start_date', 'vacation_end_date'],
@@ -78,14 +78,14 @@ router.get('/', async (req, res) => {
                         as: 'department',
                         attributes: ['id', 'name', 'email'],
                     },
-                    {
-                        model: team_emp,
-                        as: 'teams',
-                        attributes: ['team_id'],
-                        order: [
-                            ['team_id', 'ASC']
-                        ]
-                    },
+                    // {
+                    //     model: team_emp,
+                    //     as: 'teams',
+                    //     attributes: ['team_id'],
+                    //     order: [
+                    //         ['team_id', 'ASC']
+                    //     ]
+                    // },
                     {
                         model: pos,
                         as: 'position',
@@ -105,15 +105,15 @@ router.get('/', async (req, res) => {
                 for (let i = 0; i < employeeResponse.length; i++) {
                     for (let j = 0; j < vacation.length; j++) {
                         if (employeeResponse[i].id === vacation[j].employee_id) {
-                            employeeResponse[i]["vacation_start_date"] = vacation[j].start_date ? vacation[j].start_date : null;
-                            employeeResponse[i]["vacation_end_date"] = vacation[j].end_date ? vacation[j].end_date : null;
+                            employeeResponse[i].vacation_start_date = vacation[j].start_date ? vacation[j].start_date : null;
+                            employeeResponse[i].vacation_end_date = vacation[j].end_date ? vacation[j].end_date : null;
                         }
                     }
                 }
             }
             console.log("----Get all employee from HRMS---");
     
-            structure.employees = [...structure.employees, ...employeeResponse];;
+            structure.employees = [...structure.employees, ...employeeResponse];
     
             var teamResponse = await team.findAll({
                 include: [

@@ -50,7 +50,13 @@ module.exports = {
                 },
                 modified_date: {
                     type: Sequelize.DATE
-                }
+                },
+                vacation_start_date: {
+                    type: Sequelize.DATE
+                },
+                vacation_end_date: {
+                    type: Sequelize.DATE
+                },
             },
             {
                 timestamps: false,
