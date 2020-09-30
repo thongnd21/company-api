@@ -68,7 +68,7 @@ router.get('/', async (req, res) => {
                 positions: []
             }
             //get employees
-            let employeeResponse = await emp.findAll({
+            var employeeResponse = await emp.findAll({
                 attributes: ['id', 'primary_email', 'personal_email',
                     'first_name', 'last_name', 'modified_date', 'address', 'position_id',
                     'department_id', 'phone', 'status_id', 'vacation_start_date', 'vacation_end_date'],
@@ -127,7 +127,7 @@ router.get('/', async (req, res) => {
                                 model: emp,
                                 as: 'employee',
                                 order: [['id', 'ASC']],
-                                // where: { status_id: 1 }
+                                where: { status_id: 1 }
     
                             }
                         ]
