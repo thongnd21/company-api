@@ -823,8 +823,12 @@ router.post("/data", async (req, res) => {
                             console.log(employeeResult[i]["id"]);
                             console.log(result);
                             if (employeeResult[i]["id"] === result[j].employee_id) {
-                                employeeResult[i]["vacation_start_date"] = result[j].start_date ? result[j].start_date : null;
-                                employeeResult[i]["vacation_end_date"] = result[j].end_date ? result[j].end_date : null;
+                                var dt_start = result[j].start_date;
+                                dt_start.setHours(dt_start.getHours() + 7);
+                                var dt_end = result[j].end_date;
+                                dt_end.setHours(dt_end.getHours() + 7);
+                                employeeResult[i]["vacation_start_date"] = dt_start ? result[j].start_date : null;
+                                employeeResult[i]["vacation_end_date"] = dt_end ? result[j].end_date : null;   
                             }
                         }
                     }
