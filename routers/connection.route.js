@@ -573,7 +573,7 @@ router.put("/", async (req, res) => {
 
             //department query
             const departmentQuery = "SELECT " + mappingResult[1].tableHR.fields.id + " as id, " + mappingResult[1].tableHR.fields.name +
-                " as name, " + mappingResult[1].tableHR.fields.email + " FROM " + mappingResult[1].tableHR.nametableHR +
+                " as name, " + mappingResult[1].tableHR.fields.email + " as email , description FROM " + mappingResult[1].tableHR.nametableHR +
                 " AS department WHERE department.status_id = 1 ORDER BY department." + mappingResult[1].tableHR.fields.name + " ASC ";
 
 
@@ -839,10 +839,12 @@ router.post("/data", async (req, res) => {
                 }
                 var department = [];
                 for (let i = 0; i < result.length; i++) {
+                    console.log(result[i]);
                     var dep = {
                         id: result[i].id,
                         name: result[i].name,
-                        email: result[i].email
+                        email: result[i].email,
+                        description: result[i].description
                     }
                     department.push(dep)
                 }
