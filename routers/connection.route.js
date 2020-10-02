@@ -820,15 +820,13 @@ router.post("/data", async (req, res) => {
                 if (result.length > 0) {
                     for (let i = 0; i < employeeResult.length; i++) {
                         for (let j = 0; j < result.length; j++) {
-                            console.log(employeeResult[i]["id"]);
-                            console.log(result);
                             if (employeeResult[i]["id"] === result[j].employee_id) {
                                 var dt_start = result[j].start_date;
                                 dt_start.setHours(dt_start.getHours() + 7);
                                 var dt_end = result[j].end_date;
                                 dt_end.setHours(dt_end.getHours() + 7);
                                 employeeResult[i]["vacation_start_date"] = dt_start ? result[j].start_date : null;
-                                employeeResult[i]["vacation_end_date"] = dt_end ? result[j].end_date : null;   
+                                employeeResult[i]["vacation_end_date"] = dt_end ? result[j].end_date : null;
                             }
                         }
                     }
@@ -860,6 +858,7 @@ router.post("/data", async (req, res) => {
                 if (err) {
                     console.log(err);
                 }
+                console.log(result);
                 var teamResult = [
                     {
                         id: result[0].id,
@@ -875,36 +874,53 @@ router.post("/data", async (req, res) => {
                 while (index < result.length) {
                     var teamLength = 0;
                     for (let i = 0; i < result.length; i++) {
-                        if (teamResult[teamLength].id === result[i].members_team_id) {
-                            var addMember = {
-                                employee_id: result[i].members_employee_id,
-                                employee: {
-                                    employee_id: result[i].members_employee_employee_id,
-                                    primary_email: result[i].members_employee_primary_email
+                        if (teamResult[teamLength].id === result[i].id) {
+                            if (teamResult[teamLength].id === result[i].members_team_id) {
+                                var addMember = {
+                                    employee_id: result[i].members_employee_id,
+                                    employee: {
+                                        employee_id: result[i].members_employee_employee_id,
+                                        primary_email: result[i].members_employee_primary_email
+                                    }
                                 }
+                                teamResult[teamLength].members.push(addMember)
+                                index = index + 1;
                             }
-                            teamResult[teamLength].members.push(addMember)
-                            index = index + 1;
-                        } else if (teamResult[teamLength].id !== result[i].members_team_id) {
+                        }
+                        else if (teamResult[teamLength].id !== result[i].id) {
                             var addTeam =
                             {
                                 id: result[i].id,
                                 name: result[i].name,
                                 email: result[i].email,
                                 description: result[i].description,
-                                members: [
-                                    {
-                                        employee_id: result[i].members_employee_id,
-                                        employee: {
-                                            employee_id: result[i].members_employee_employee_id,
-                                            primary_email: result[i].members_employee_primary_email
-                                        }
-                                    }
-                                ]
+                                members: []
                             }
-                                ;
+
                             teamResult.push(addTeam)
                             teamLength = teamLength + 1;
+                            if (result[i].members_team_id != null) {
+
+                                var addMember = {
+                                    employee_id: result[i].members_employee_id,
+                                    employee: {
+                                        employee_id: result[i].members_employee_employee_id,
+                                        primary_email: result[i].members_employee_primary_email
+                                    }
+                                }
+                                teamResult[teamLength].members.push(addMember)
+                            }
+                            // if (teamResult[teamLength].id !== result[i].id && result[i].members_team_id != null) {
+                            //     var addMember = {
+                            //         employee_id: result[i].members_employee_id,
+                            //         employee: {
+                            //             employee_id: result[i].members_employee_employee_id,
+                            //             primary_email: result[i].members_employee_primary_email
+                            //         }
+                            //     }
+                            //     teamResult[teamLength].members.push(addMember)
+                            // }
+
                             index = index + 1;
                         }
                     }
