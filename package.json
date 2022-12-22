@@ -30,7 +30,7 @@
     "googleapis": "^39.2.0",
     "gtoken": "^5.0.1",
     "http": "0.0.1-security",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "mssql": "^6.2.1",
     "mysql": "^2.18.1",
     "mysql2": "^2.1.0",
